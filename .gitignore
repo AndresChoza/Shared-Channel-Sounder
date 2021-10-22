@@ -129,4 +129,4 @@ dmypy.json
 .pyre/
 
 #Dirs
-/SendDataTest/Saves
+Saves/
