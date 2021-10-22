@@ -1,0 +1,10 @@
+<RCC>
+  <qresource prefix="botones">
+    <file>BotonCaptura.jpg</file>
+    <file>BotonConf.jpg</file>
+    <file>BotonOpenfile.jpg</file>
+    <file>Botonpausa.jpg</file>
+    <file>BotonPlay.jpg</file>
+    <file>BotonRec.jpg</file>
+  </qresource>
+</RCC>
