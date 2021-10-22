@@ -1,6 +1,7 @@
 from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import QUrl
+from Back.server import Server
 from VISTA.UI.ui_main import Ui_FrmMain
 from VISTA.vSettings import Vsettings
 from VISTA.vOpenFile import VopenFile
@@ -15,11 +16,13 @@ import csv
 import plotly.express as px
 import json
 import os
+
+from Back import server
 class Principal(QDialog):
 
     def __init__(self):
         super().__init__()
-
+        self.status = False
         self.inicializar_gui()
     
     def inicializar_gui(self):
@@ -33,7 +36,7 @@ class Principal(QDialog):
 
         #Botones Generales Record
         self.ui.btnSettings.clicked.connect(self.Vsetting.mostrar)
-        self.ui.btnRec.clicked.connect(self.alertar)
+        self.ui.btnRec.clicked.connect(self.StartSesion)
         self.ui.pushButton_4.clicked.connect(self.saveFile)
 
         #Botones Generales Replay
@@ -195,6 +198,18 @@ class Principal(QDialog):
         if self.ui.rBtnMapRep2.isChecked():
             self.ui.WRepG2.setHtml(data.getvalue().decode())
         #self.addWidget(webView)
+
+    def StartSesion(self):
+        if not self.status:
+            self.status = True
+            self.serv = Server()
+            self.serv.start()
+        else:
+            self.status = False
+            self.serv.shutdown_flag.set()
+            self.serv.join()
+            print("End")
+        
 
 def main():
     app = QApplication(sys.argv)

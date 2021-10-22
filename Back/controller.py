@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 import csv
-import Operaciones as Op
+from . import Operaciones as Op
 import numpy as np
 import time
 import os
@@ -13,7 +13,11 @@ class head:
     def __init__(self, pos):
         self.time = datetime.today().strftime('%Y-%m-%d %H:%M:%f')
         self.possition = pos
-        
+class sesion_header:
+    def __init__(self, name, size, dir):
+        self.name = name
+        self.size = size
+        self.dir = dir
 class Coordenates:
     def __init__(self):
         self.latitude = 20.6
@@ -80,6 +84,11 @@ class controller:
 
     def close(self):
         print("Closing the sesion")
+
+        text_file = open("./Saves/" + self.date + ".json", "w")
+        text_file.write(json.dumps(sesion_header(self.date, self.count, "/"+self.date+"/").__dict__))
+        text_file.close()
+
         print("Making the average graphs...")
 
         print("Power Delay Profile:")

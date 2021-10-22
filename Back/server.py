@@ -1,7 +1,7 @@
 import socket
 import time
 import numpy as np
-import controller
+from . import controller
 import threading
 import signal
 class Server(threading.Thread):
