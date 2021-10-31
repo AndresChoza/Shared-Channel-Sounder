@@ -31,8 +31,6 @@ class Principal(QDialog):
         self.VopenFile = VopenFile()
         self.ui.setupUi(self)
         
-        self.mensaje = QMessageBox(self)
-        self.mensaje.setWindowTitle('Mensaje')
 
         #Botones Generales Record
         self.ui.btnSettings.clicked.connect(self.Vsetting.mostrar)
@@ -40,53 +38,54 @@ class Principal(QDialog):
         self.ui.pushButton_4.clicked.connect(self.saveFile)
 
         #Botones Generales Replay
-        self.ui.btnPlay.clicked.connect(self.alertar)
-        self.ui.btnPause.clicked.connect(self.alertar)
+        self.ui.btnPlay.clicked.connect(lambda: self.alertar("Elemento en contruccion"))
+        self.ui.btnPause.clicked.connect(lambda: self.alertar("Elemento en contruccion"))
         self.ui.btnOpenFile.clicked.connect(self.getCSV)
 
         #Botones REC Grafica 1
 
         self.ui.rBtnMapRec1.clicked.connect(self.viewMap)
-        self.ui.rBtnPDDRRec1.clicked.connect(self.alertar)
-        self.ui.rBtnFDDRec1.clicked.connect(self.alertar)
-        self.ui.rBtnFDARec1.clicked.connect(self.alertar) 
-        self.ui.rBtnDEDPRec1.clicked.connect(self.alertar)
-        self.ui.rBtnFDCTRec1.clicked.connect(self.alertar)
+        self.ui.rBtnPDDRRec1.clicked.connect(lambda: self.alertar("Elemento en contruccion"))
+        self.ui.rBtnFDDRec1.clicked.connect(lambda: self.alertar("Elemento en contruccion"))
+        self.ui.rBtnFDARec1.clicked.connect(lambda: self.alertar("Elemento en contruccion")) 
+        self.ui.rBtnDEDPRec1.clicked.connect(lambda: self.alertar("Elemento en contruccion"))
+        self.ui.rBtnFDCTRec1.clicked.connect(lambda: self.alertar("Elemento en contruccion"))
 
         #Botones REC Grafica 2
 
         self.ui.rBtnMapRec2.clicked.connect(self.viewMap)
-        self.ui.rBtnPDDRRec2.clicked.connect(self.alertar)
-        self.ui.rBtnFDDRec2.clicked.connect(self.alertar)
-        self.ui.rBtnFDARec2.clicked.connect(self.alertar) 
-        self.ui.rBtnDEDPRec2.clicked.connect(self.alertar)
-        self.ui.rBtnFDCTRec2.clicked.connect(self.alertar)
+        self.ui.rBtnPDDRRec2.clicked.connect(lambda: self.alertar("Elemento en contruccion"))
+        self.ui.rBtnFDDRec2.clicked.connect(lambda: self.alertar("Elemento en contruccion"))
+        self.ui.rBtnFDARec2.clicked.connect(lambda: self.alertar("Elemento en contruccion")) 
+        self.ui.rBtnDEDPRec2.clicked.connect(lambda: self.alertar("Elemento en contruccion"))
+        self.ui.rBtnFDCTRec2.clicked.connect(lambda: self.alertar("Elemento en contruccion"))
 
         #Botones Replay Grafica 1
 
         self.ui.rBtnMapRep1.clicked.connect(self.viewMap) 
-        self.ui.rBtnPDDRRep1.clicked.connect(self.alertar)
-        self.ui.rBtnFDDRep1.clicked.connect(self.alertar)
-        self.ui.rBtnFDARep1.clicked.connect(self.alertar) 
-        self.ui.rBtnDEDPRep1.clicked.connect(self.alertar)
-        self.ui.rBtnFDCTRep1.clicked.connect(self.alertar)
+        self.ui.rBtnPDDRRep1.clicked.connect(lambda: self.plot("PDDR", "1"))
+        self.ui.rBtnFDDRep1.clicked.connect(lambda: self.plot("FDD", "1"))
+        self.ui.rBtnFDARep1.clicked.connect(lambda: self.plot("FDA", "1")) 
+        self.ui.rBtnDEDPRep1.clicked.connect(lambda: self.plot("DEDP", "1"))
+        self.ui.rBtnFDCTRep1.clicked.connect(lambda: self.plot("FDCT", "1"))
 
         #Botones Replay Grafica 2
 
         self.ui.rBtnMapRep2.clicked.connect(self.viewMap)
-        self.ui.rBtnPDDRRep2.clicked.connect(self.alertar)
-        self.ui.rBtnFDDRep2.clicked.connect(lambda: self.plot("DEDP"))
-        self.ui.rBtnFDDRep2.clicked.connect(self.alertar)
-        self.ui.rBtnFDARep2.clicked.connect(self.alertar) 
-        self.ui.rBtnDEDPRep2.clicked.connect(self.alertar)
-        self.ui.rBtnFDCTRep2.clicked.connect(self.alertar)
+        self.ui.rBtnPDDRRep2.clicked.connect(lambda: self.plot("PDDR", "2"))
+        self.ui.rBtnFDDRep2.clicked.connect(lambda: self.plot("FDD", "2"))
+        self.ui.rBtnFDARep2.clicked.connect(lambda: self.plot("FDA", "2")) 
+        self.ui.rBtnDEDPRep2.clicked.connect(lambda: self.plot("DEDP", "2"))
+        self.ui.rBtnFDCTRep2.clicked.connect(lambda: self.plot("FDCT", "2"))
 
         self.show()
 
-    def alertar(self):
-        self.mensaje.setIcon(QMessageBox.Warning)
-        self.mensaje.setText('Elemento en construccion')
-        self.mensaje.exec_()
+    def alertar(self,texto):
+        mensaje = QMessageBox(self)
+        mensaje.setWindowTitle('Mensaje')
+        mensaje.setIcon(QMessageBox.Warning)
+        mensaje.setText(texto)
+        mensaje.exec_()
 
     def getCSV(self):
         # this will get only the header file, with the header file will know all the information necesary to show the record of a sesion
@@ -96,13 +95,14 @@ class Principal(QDialog):
             self.info = json.load(open(filePath))
             self.graphsRoute = os.path.dirname(filePath) + self.info['dir']
             print(self.info)
-            
+            self.alertar("Archivo cargado")
 
-    def plot(self, graph):
+    def plot(self, graph, Wview):
         graphRoute = self.graphsRoute + "0"
         # Switch
         if graph == "FDA":
             graphRoute += "/correlacionDeFrecuencia.csv"
+            lambda: self.setSlider(10)
         if graph == "PDDR":
             graphRoute += "/perfilDePotenciaDeRetardo.csv"
         if graph == "DEDP":
@@ -166,9 +166,12 @@ class Principal(QDialog):
 
         #url = QUrl("C:/Users/Jesus/Desktop/Shared work/Channel-Sounder/imgtest.html")
         url = QUrl(os.path.abspath(__file__).replace(os.sep, '/'))
-
-        self.ui.WRepG2.setZoomFactor(0.5)
-        self.ui.WRepG2.setHtml(html, baseUrl=url)
+        if Wview == "1":
+            self.ui.WRepG1.setZoomFactor(0.5)
+            self.ui.WRepG1.setHtml(html, baseUrl=url)
+        if Wview == "2":
+            self.ui.WRepG2.setZoomFactor(0.5)
+            self.ui.WRepG2.setHtml(html, baseUrl=url)
         
     def saveFile(self):
         options = QFileDialog.Options()
@@ -213,7 +216,11 @@ class Principal(QDialog):
             self.ui.btnRec.setStyleSheet("border-image: url(:/botones/BotonRec.jpg);")
 
             print("End")
-        
+    
+    def setSlider(self,top):
+        self.ui.horizontalSlider.setMinimum(0)
+        self.ui.horizontalSlider.setMaximum(top)
+        self.ui.horizontalSlider.setTickInterval(2)
 
 def main():
     app = QApplication(sys.argv)
