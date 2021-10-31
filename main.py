@@ -47,38 +47,39 @@ class Principal(QDialog):
         #Botones REC Grafica 1
 
         self.ui.rBtnMapRec1.clicked.connect(self.viewMap)
-        self.ui.rBtn3DRec1.clicked.connect(self.alertar)
-        self.ui.rBtnPDPRec1.clicked.connect(self.alertar)
-        self.ui.rBtnPSPRec1.clicked.connect(self.alertar) 
-        self.ui.radioButton_20.clicked.connect(self.alertar)
-        self.ui.radioButton_24.clicked.connect(self.alertar)
+        self.ui.rBtnPDDRRec1.clicked.connect(self.alertar)
+        self.ui.rBtnFDDRec1.clicked.connect(self.alertar)
+        self.ui.rBtnFDARec1.clicked.connect(self.alertar) 
+        self.ui.rBtnDEDPRec1.clicked.connect(self.alertar)
+        self.ui.rBtnFDCTRec1.clicked.connect(self.alertar)
 
         #Botones REC Grafica 2
 
         self.ui.rBtnMapRec2.clicked.connect(self.viewMap)
-        self.ui.rBtn3DRec2.clicked.connect(self.alertar)
-        self.ui.rBtnPDPRec2.clicked.connect(self.alertar)
-        self.ui.radioButton_29.clicked.connect(self.alertar) 
-        self.ui.radioButton_26.clicked.connect(self.alertar)
-        self.ui.radioButton_30.clicked.connect(self.alertar) 
+        self.ui.rBtnPDDRRec2.clicked.connect(self.alertar)
+        self.ui.rBtnFDDRec2.clicked.connect(self.alertar)
+        self.ui.rBtnFDARec2.clicked.connect(self.alertar) 
+        self.ui.rBtnDEDPRec2.clicked.connect(self.alertar)
+        self.ui.rBtnFDCTRec2.clicked.connect(self.alertar)
 
         #Botones Replay Grafica 1
 
         self.ui.rBtnMapRep1.clicked.connect(self.viewMap) 
-        self.ui.rBtn3DRep1.clicked.connect(self.alertar)
-        self.ui.rBtnPDPRep1.clicked.connect(self.alertar)
-        self.ui.rBtnPSPRep1.clicked.connect(self.alertar)  
-        self.ui.radioButton_14.clicked.connect(self.alertar)
-        self.ui.radioButton_18.clicked.connect(self.alertar)
+        self.ui.rBtnPDDRRep1.clicked.connect(self.alertar)
+        self.ui.rBtnFDDRep1.clicked.connect(self.alertar)
+        self.ui.rBtnFDARep1.clicked.connect(self.alertar) 
+        self.ui.rBtnDEDPRep1.clicked.connect(self.alertar)
+        self.ui.rBtnFDCTRep1.clicked.connect(self.alertar)
 
         #Botones Replay Grafica 2
 
         self.ui.rBtnMapRep2.clicked.connect(self.viewMap)
-        self.ui.rBtn3DRep2.clicked.connect(self.alertar)
-        self.ui.rBtnPDPRep2.clicked.connect(lambda: self.plot("DEDP"))
-        self.ui.rBtnPSPRep2.clicked.connect(self.alertar)  
-        self.ui.radioButton_10.clicked.connect(self.alertar)
-        self.ui.radioButton_7.clicked.connect(self.alertar)
+        self.ui.rBtnPDDRRep2.clicked.connect(self.alertar)
+        self.ui.rBtnFDDRep2.clicked.connect(lambda: self.plot("DEDP"))
+        self.ui.rBtnFDDRep2.clicked.connect(self.alertar)
+        self.ui.rBtnFDARep2.clicked.connect(self.alertar) 
+        self.ui.rBtnDEDPRep2.clicked.connect(self.alertar)
+        self.ui.rBtnFDCTRep2.clicked.connect(self.alertar)
 
         self.show()
 
@@ -204,10 +205,13 @@ class Principal(QDialog):
             self.status = True
             self.serv = Server()
             self.serv.start()
+            self.ui.btnRec.setStyleSheet("border-image: url(:/botones/BotonStop.jpg);")
         else:
             self.status = False
             self.serv.shutdown_flag.set()
             self.serv.join()
+            self.ui.btnRec.setStyleSheet("border-image: url(:/botones/BotonRec.jpg);")
+
             print("End")
         
 
