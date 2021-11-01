@@ -1,5 +1,6 @@
 <RCC>
   <qresource prefix="botones">
+    <file>BotonStop.jpg</file>
     <file>BotonCaptura.jpg</file>
     <file>BotonConf.jpg</file>
     <file>BotonOpenfile.jpg</file>

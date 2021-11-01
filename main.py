@@ -32,8 +32,6 @@ class Principal(QDialog):
         self.VopenFile = VopenFile()
         self.ui.setupUi(self)
         
-        self.mensaje = QMessageBox(self)
-        self.mensaje.setWindowTitle('Mensaje')
 
         #Botones Generales Record
         self.ui.btnSettings.clicked.connect(self.Vsetting.mostrar)
@@ -41,52 +39,54 @@ class Principal(QDialog):
         self.ui.pushButton_4.clicked.connect(self.saveFile)
 
         #Botones Generales Replay
-        self.ui.btnPlay.clicked.connect(self.alertar)
-        self.ui.btnPause.clicked.connect(self.alertar)
+        self.ui.btnPlay.clicked.connect(lambda: self.alertar("Elemento en contruccion"))
+        self.ui.btnPause.clicked.connect(lambda: self.alertar("Elemento en contruccion"))
         self.ui.btnOpenFile.clicked.connect(self.getCSV)
 
         #Botones REC Grafica 1
 
         self.ui.rBtnMapRec1.clicked.connect(self.viewMap)
-        self.ui.rBtn3DRec1.clicked.connect(self.alertar)
-        self.ui.rBtnPDPRec1.clicked.connect(self.alertar)
-        self.ui.rBtnPSPRec1.clicked.connect(self.alertar) 
-        self.ui.radioButton_20.clicked.connect(self.alertar)
-        self.ui.radioButton_24.clicked.connect(self.alertar)
+        self.ui.rBtnPDDRRec1.clicked.connect(lambda: self.alertar("Elemento en contruccion"))
+        self.ui.rBtnFDDRec1.clicked.connect(lambda: self.alertar("Elemento en contruccion"))
+        self.ui.rBtnFDARec1.clicked.connect(lambda: self.alertar("Elemento en contruccion")) 
+        self.ui.rBtnDEDPRec1.clicked.connect(lambda: self.alertar("Elemento en contruccion"))
+        self.ui.rBtnFDCTRec1.clicked.connect(lambda: self.alertar("Elemento en contruccion"))
 
         #Botones REC Grafica 2
 
         self.ui.rBtnMapRec2.clicked.connect(self.viewMap)
-        self.ui.rBtn3DRec2.clicked.connect(self.alertar)
-        self.ui.rBtnPDPRec2.clicked.connect(self.alertar)
-        self.ui.radioButton_29.clicked.connect(self.alertar) 
-        self.ui.radioButton_26.clicked.connect(self.alertar)
-        self.ui.radioButton_30.clicked.connect(self.alertar) 
+        self.ui.rBtnPDDRRec2.clicked.connect(lambda: self.alertar("Elemento en contruccion"))
+        self.ui.rBtnFDDRec2.clicked.connect(lambda: self.alertar("Elemento en contruccion"))
+        self.ui.rBtnFDARec2.clicked.connect(lambda: self.alertar("Elemento en contruccion")) 
+        self.ui.rBtnDEDPRec2.clicked.connect(lambda: self.alertar("Elemento en contruccion"))
+        self.ui.rBtnFDCTRec2.clicked.connect(lambda: self.alertar("Elemento en contruccion"))
 
         #Botones Replay Grafica 1
 
         self.ui.rBtnMapRep1.clicked.connect(self.viewMap) 
-        self.ui.rBtn3DRep1.clicked.connect(self.alertar)
-        self.ui.rBtnPDPRep1.clicked.connect(self.alertar)
-        self.ui.rBtnPSPRep1.clicked.connect(self.alertar)  
-        self.ui.radioButton_14.clicked.connect(self.alertar)
-        self.ui.radioButton_18.clicked.connect(self.alertar)
+        self.ui.rBtnPDDRRep1.clicked.connect(lambda: self.plot("PDDR", "1"))
+        self.ui.rBtnFDDRep1.clicked.connect(lambda: self.plot("FDD", "1"))
+        self.ui.rBtnFDARep1.clicked.connect(lambda: self.plot("FDA", "1")) 
+        self.ui.rBtnDEDPRep1.clicked.connect(lambda: self.plot("DEDP", "1"))
+        self.ui.rBtnFDCTRep1.clicked.connect(lambda: self.plot("FDCT", "1"))
 
         #Botones Replay Grafica 2
 
         self.ui.rBtnMapRep2.clicked.connect(self.viewMap)
-        self.ui.rBtn3DRep2.clicked.connect(self.alertar)
-        self.ui.rBtnPDPRep2.clicked.connect(lambda: self.plot("DEDP"))
-        self.ui.rBtnPSPRep2.clicked.connect(self.alertar)  
-        self.ui.radioButton_10.clicked.connect(self.alertar)
-        self.ui.radioButton_7.clicked.connect(self.alertar)
+        self.ui.rBtnPDDRRep2.clicked.connect(lambda: self.plot("PDDR", "2"))
+        self.ui.rBtnFDDRep2.clicked.connect(lambda: self.plot("FDD", "2"))
+        self.ui.rBtnFDARep2.clicked.connect(lambda: self.plot("FDA", "2")) 
+        self.ui.rBtnDEDPRep2.clicked.connect(lambda: self.plot("DEDP", "2"))
+        self.ui.rBtnFDCTRep2.clicked.connect(lambda: self.plot("FDCT", "2"))
 
         self.show()
 
-    def alertar(self):
-        self.mensaje.setIcon(QMessageBox.Warning)
-        self.mensaje.setText('Elemento en construccion')
-        self.mensaje.exec_()
+    def alertar(self,texto):
+        mensaje = QMessageBox(self)
+        mensaje.setWindowTitle('Mensaje')
+        mensaje.setIcon(QMessageBox.Warning)
+        mensaje.setText(texto)
+        mensaje.exec_()
 
     def getCSV(self):
         # this will get only the header file, with the header file will know all the information necesary to show the record of a sesion
@@ -96,13 +96,14 @@ class Principal(QDialog):
             self.info = json.load(open(filePath))
             self.graphsRoute = os.path.dirname(filePath) + self.info['dir']
             print(self.info)
-            
+            self.alertar("Archivo cargado")
 
-    def plot(self, graph):
+    def plot(self, graph, Wview):
         graphRoute = self.graphsRoute + "0"
         # Switch
         if graph == "FDA":
             graphRoute += "/correlacionDeFrecuencia.csv"
+            lambda: self.setSlider(10)
         if graph == "PDDR":
             graphRoute += "/perfilDePotenciaDeRetardo.csv"
         if graph == "DEDP":
@@ -220,12 +221,19 @@ class Principal(QDialog):
             self.status = True
             self.serv = Server()
             self.serv.start()
+            self.ui.btnRec.setStyleSheet("border-image: url(:/botones/BotonStop.jpg);")
         else:
             self.status = False
             self.serv.shutdown_flag.set()
             self.serv.join()
+            self.ui.btnRec.setStyleSheet("border-image: url(:/botones/BotonRec.jpg);")
+
             print("End")
-        
+    
+    def setSlider(self,top):
+        self.ui.horizontalSlider.setMinimum(0)
+        self.ui.horizontalSlider.setMaximum(top)
+        self.ui.horizontalSlider.setTickInterval(2)
 
 def main():
     app = QApplication(sys.argv)

@@ -169,7 +169,7 @@ font: 14pt &quot;MS Shell Dlg 2&quot;;
       </rect>
      </property>
      <property name="styleSheet">
-      <string notr="true">border-image: url(:/botones/BotonPlay.jpg);</string>
+      <string notr="true">border-image: url(:/botones/BotonRec.jpg);</string>
      </property>
      <property name="text">
       <string/>
@@ -231,7 +231,7 @@ font: 14pt &quot;MS Shell Dlg 2&quot;;
      <property name="title">
       <string>Grafica 1</string>
      </property>
-     <widget class="QRadioButton" name="rBtn3DRec1">
+     <widget class="QRadioButton" name="rBtnPDDRRec1">
       <property name="geometry">
        <rect>
         <x>20</x>
@@ -250,10 +250,10 @@ font: 14pt &quot;MS Shell Dlg 2&quot;;
        </font>
       </property>
       <property name="text">
-       <string>3D Superficie</string>
+       <string>PDDR</string>
       </property>
      </widget>
-     <widget class="QRadioButton" name="radioButton_20">
+     <widget class="QRadioButton" name="rBtnDEDPRec1">
       <property name="geometry">
        <rect>
         <x>170</x>
@@ -272,10 +272,10 @@ font: 14pt &quot;MS Shell Dlg 2&quot;;
        </font>
       </property>
       <property name="text">
-       <string>Grafica 5</string>
+       <string>DEDP</string>
       </property>
      </widget>
-     <widget class="QRadioButton" name="rBtnPDPRec1">
+     <widget class="QRadioButton" name="rBtnFDDRec1">
       <property name="geometry">
        <rect>
         <x>20</x>
@@ -294,7 +294,7 @@ font: 14pt &quot;MS Shell Dlg 2&quot;;
        </font>
       </property>
       <property name="text">
-       <string>PDP</string>
+       <string>FDD</string>
       </property>
      </widget>
      <widget class="QRadioButton" name="rBtnMapRec1">
@@ -319,7 +319,7 @@ font: 14pt &quot;MS Shell Dlg 2&quot;;
        <string>Mapa</string>
       </property>
      </widget>
-     <widget class="QRadioButton" name="rBtnPSPRec1">
+     <widget class="QRadioButton" name="rBtnFDARec1">
       <property name="geometry">
        <rect>
         <x>170</x>
@@ -338,10 +338,10 @@ font: 14pt &quot;MS Shell Dlg 2&quot;;
        </font>
       </property>
       <property name="text">
-       <string>PSP</string>
+       <string>FDA</string>
       </property>
      </widget>
-     <widget class="QRadioButton" name="radioButton_24">
+     <widget class="QRadioButton" name="rBtnFDCTRec1">
       <property name="geometry">
        <rect>
         <x>170</x>
@@ -360,7 +360,7 @@ font: 14pt &quot;MS Shell Dlg 2&quot;;
        </font>
       </property>
       <property name="text">
-       <string>Grafica 6</string>
+       <string>FDCT</string>
       </property>
      </widget>
     </widget>
@@ -388,7 +388,7 @@ font: 14pt &quot;MS Shell Dlg 2&quot;;
      <property name="title">
       <string>Grafica 2</string>
      </property>
-     <widget class="QRadioButton" name="rBtn3DRec2">
+     <widget class="QRadioButton" name="rBtnPDDRRec2">
       <property name="geometry">
        <rect>
         <x>20</x>
@@ -407,10 +407,10 @@ font: 14pt &quot;MS Shell Dlg 2&quot;;
        </font>
       </property>
       <property name="text">
-       <string>3D Superficie</string>
+       <string>PDDR</string>
       </property>
      </widget>
-     <widget class="QRadioButton" name="radioButton_26">
+     <widget class="QRadioButton" name="rBtnDEDPRec2">
       <property name="geometry">
        <rect>
         <x>170</x>
@@ -429,10 +429,10 @@ font: 14pt &quot;MS Shell Dlg 2&quot;;
        </font>
       </property>
       <property name="text">
-       <string>Grafica 5</string>
+       <string>DEDP</string>
       </property>
      </widget>
-     <widget class="QRadioButton" name="rBtnPDPRec2">
+     <widget class="QRadioButton" name="rBtnFDDRec2">
       <property name="geometry">
        <rect>
         <x>20</x>
@@ -451,7 +451,7 @@ font: 14pt &quot;MS Shell Dlg 2&quot;;
        </font>
       </property>
       <property name="text">
-       <string>PDP</string>
+       <string>FDD</string>
       </property>
      </widget>
      <widget class="QRadioButton" name="rBtnMapRec2">
@@ -476,7 +476,7 @@ font: 14pt &quot;MS Shell Dlg 2&quot;;
        <string>Mapa</string>
       </property>
      </widget>
-     <widget class="QRadioButton" name="radioButton_29">
+     <widget class="QRadioButton" name="rBtnFDARec2">
       <property name="geometry">
        <rect>
         <x>170</x>
@@ -495,10 +495,10 @@ font: 14pt &quot;MS Shell Dlg 2&quot;;
        </font>
       </property>
       <property name="text">
-       <string>PSP</string>
+       <string>FDA</string>
       </property>
      </widget>
-     <widget class="QRadioButton" name="radioButton_30">
+     <widget class="QRadioButton" name="rBtnFDCTRec2">
       <property name="geometry">
        <rect>
         <x>170</x>
@@ -517,7 +517,7 @@ font: 14pt &quot;MS Shell Dlg 2&quot;;
        </font>
       </property>
       <property name="text">
-       <string>Grafica 6</string>
+       <string>FDCT</string>
       </property>
      </widget>
     </widget>
@@ -580,7 +580,7 @@ font: 14pt &quot;MS Shell Dlg 2&quot;;
      <property name="title">
       <string>Grafica 2</string>
      </property>
-     <widget class="QRadioButton" name="rBtn3DRep2">
+     <widget class="QRadioButton" name="rBtnPDDRRep2">
       <property name="geometry">
        <rect>
         <x>20</x>
@@ -599,10 +599,10 @@ font: 14pt &quot;MS Shell Dlg 2&quot;;
        </font>
       </property>
       <property name="text">
-       <string>3D Superficie</string>
+       <string>PDDR</string>
       </property>
      </widget>
-     <widget class="QRadioButton" name="radioButton_10">
+     <widget class="QRadioButton" name="rBtnDEDPRep2">
       <property name="geometry">
        <rect>
         <x>170</x>
@@ -621,10 +621,10 @@ font: 14pt &quot;MS Shell Dlg 2&quot;;
        </font>
       </property>
       <property name="text">
-       <string>Grafica 5</string>
+       <string>DEDP</string>
       </property>
      </widget>
-     <widget class="QRadioButton" name="rBtnPDPRep2">
+     <widget class="QRadioButton" name="rBtnFDDRep2">
       <property name="geometry">
        <rect>
         <x>20</x>
@@ -643,7 +643,7 @@ font: 14pt &quot;MS Shell Dlg 2&quot;;
        </font>
       </property>
       <property name="text">
-       <string>PDP</string>
+       <string>FDD</string>
       </property>
      </widget>
      <widget class="QRadioButton" name="rBtnMapRep2">
@@ -668,7 +668,7 @@ font: 14pt &quot;MS Shell Dlg 2&quot;;
        <string>Mapa</string>
       </property>
      </widget>
-     <widget class="QRadioButton" name="rBtnPSPRep2">
+     <widget class="QRadioButton" name="rBtnFDARep2">
       <property name="geometry">
        <rect>
         <x>170</x>
@@ -687,10 +687,10 @@ font: 14pt &quot;MS Shell Dlg 2&quot;;
        </font>
       </property>
       <property name="text">
-       <string>PSP</string>
+       <string>FDA</string>
       </property>
      </widget>
-     <widget class="QRadioButton" name="radioButton_7">
+     <widget class="QRadioButton" name="rBtnFDCTRep2">
       <property name="geometry">
        <rect>
         <x>170</x>
@@ -709,7 +709,7 @@ font: 14pt &quot;MS Shell Dlg 2&quot;;
        </font>
       </property>
       <property name="text">
-       <string>Grafica 6</string>
+       <string>FDCT</string>
       </property>
      </widget>
     </widget>
@@ -737,7 +737,7 @@ font: 14pt &quot;MS Shell Dlg 2&quot;;
      <property name="title">
       <string>Grafica 1</string>
      </property>
-     <widget class="QRadioButton" name="rBtn3DRep1">
+     <widget class="QRadioButton" name="rBtnPDDRRep1">
       <property name="geometry">
        <rect>
         <x>20</x>
@@ -745,6 +745,12 @@ font: 14pt &quot;MS Shell Dlg 2&quot;;
         <width>141</width>
         <height>31</height>
        </rect>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>31</height>
+       </size>
       </property>
       <property name="font">
        <font>
@@ -756,10 +762,10 @@ font: 14pt &quot;MS Shell Dlg 2&quot;;
        </font>
       </property>
       <property name="text">
-       <string>3D Superficie</string>
+       <string>PDDR</string>
       </property>
      </widget>
-     <widget class="QRadioButton" name="radioButton_14">
+     <widget class="QRadioButton" name="rBtnDEDPRep1">
       <property name="geometry">
        <rect>
         <x>170</x>
@@ -778,10 +784,10 @@ font: 14pt &quot;MS Shell Dlg 2&quot;;
        </font>
       </property>
       <property name="text">
-       <string>Grafica 5</string>
+       <string>DEDP</string>
       </property>
      </widget>
-     <widget class="QRadioButton" name="rBtnPDPRep1">
+     <widget class="QRadioButton" name="rBtnFDDRep1">
       <property name="geometry">
        <rect>
         <x>20</x>
@@ -800,7 +806,7 @@ font: 14pt &quot;MS Shell Dlg 2&quot;;
        </font>
       </property>
       <property name="text">
-       <string>PDP</string>
+       <string>FDD</string>
       </property>
      </widget>
      <widget class="QRadioButton" name="rBtnMapRep1">
@@ -825,7 +831,7 @@ font: 14pt &quot;MS Shell Dlg 2&quot;;
        <string>Mapa</string>
       </property>
      </widget>
-     <widget class="QRadioButton" name="rBtnPSPRep1">
+     <widget class="QRadioButton" name="rBtnFDARep1">
       <property name="geometry">
        <rect>
         <x>170</x>
@@ -844,10 +850,10 @@ font: 14pt &quot;MS Shell Dlg 2&quot;;
        </font>
       </property>
       <property name="text">
-       <string>PSP</string>
+       <string>FDA</string>
       </property>
      </widget>
-     <widget class="QRadioButton" name="radioButton_18">
+     <widget class="QRadioButton" name="rBtnFDCTRep1">
       <property name="geometry">
        <rect>
         <x>170</x>
@@ -866,7 +872,7 @@ font: 14pt &quot;MS Shell Dlg 2&quot;;
        </font>
       </property>
       <property name="text">
-       <string>Grafica 6</string>
+       <string>FDCT</string>
       </property>
      </widget>
     </widget>
