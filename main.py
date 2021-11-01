@@ -1,6 +1,6 @@
 from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import *
-from PyQt5.QtCore import QByteArray, QUrl
+from PyQt5.QtCore import QByteArray, QUrl, Qt
 from Back.server import Server
 from VISTA.UI.ui_main import Ui_FrmMain
 from VISTA.vSettings import Vsettings
@@ -24,6 +24,9 @@ class Principal(QDialog):
     def __init__(self):
         super().__init__()
         self.status = False
+        self.G1 = "none"
+        self.G2 = "none"
+
         self.inicializar_gui()
     
     def inicializar_gui(self):
@@ -64,22 +67,31 @@ class Principal(QDialog):
         #Botones Replay Grafica 1
 
         self.ui.rBtnMapRep1.clicked.connect(self.viewMap) 
-        self.ui.rBtnPDDRRep1.clicked.connect(lambda: self.plot("PDDR", "1"))
-        self.ui.rBtnFDDRep1.clicked.connect(lambda: self.plot("FDD", "1"))
-        self.ui.rBtnFDARep1.clicked.connect(lambda: self.plot("FDA", "1")) 
-        self.ui.rBtnDEDPRep1.clicked.connect(lambda: self.plot("DEDP", "1"))
-        self.ui.rBtnFDCTRep1.clicked.connect(lambda: self.plot("FDCT", "1"))
+        self.ui.rBtnPDDRRep1.clicked.connect(lambda: self.plot("PDDR", "1", "0"))
+        self.ui.rBtnFDDRep1.clicked.connect(lambda: self.plot("FDD", "1", "0"))
+        self.ui.rBtnFDARep1.clicked.connect(lambda: self.plot("FDA", "1", "0")) 
+        self.ui.rBtnDEDPRep1.clicked.connect(lambda: self.plot("DEDP", "1", "0"))
+        self.ui.rBtnFDCTRep1.clicked.connect(lambda: self.plot("FDCT", "1", "0"))
 
         #Botones Replay Grafica 2
 
         self.ui.rBtnMapRep2.clicked.connect(self.viewMap)
-        self.ui.rBtnPDDRRep2.clicked.connect(lambda: self.plot("PDDR", "2"))
-        self.ui.rBtnFDDRep2.clicked.connect(lambda: self.plot("FDD", "2"))
-        self.ui.rBtnFDARep2.clicked.connect(lambda: self.plot("FDA", "2")) 
-        self.ui.rBtnDEDPRep2.clicked.connect(lambda: self.plot("DEDP", "2"))
-        self.ui.rBtnFDCTRep2.clicked.connect(lambda: self.plot("FDCT", "2"))
+        self.ui.rBtnPDDRRep2.clicked.connect(lambda: self.plot("PDDR", "2", "0"))
+        self.ui.rBtnFDDRep2.clicked.connect(lambda: self.plot("FDD", "2", "0"))
+        self.ui.rBtnFDARep2.clicked.connect(lambda: self.plot("FDA", "2", "0")) 
+        self.ui.rBtnDEDPRep2.clicked.connect(lambda: self.plot("DEDP", "2", "0"))
+        self.ui.rBtnFDCTRep2.clicked.connect(lambda: self.plot("FDCT", "2", "0"))
+
+        self.ui.horizontalSlider.valueChanged.connect(self.valuechange)
 
         self.show()
+    def valuechange(self):
+        size = self.ui.horizontalSlider.value()
+        print(size, self.G1, self.G2)
+        if self.G1 != "none":
+            self.plot(self.G1, "1", str(size))
+        if self.G2 != "none":
+            self.plot(self.G2, "2", str(size))
 
     def alertar(self,texto):
         mensaje = QMessageBox(self)
@@ -98,12 +110,17 @@ class Principal(QDialog):
             print(self.info)
             self.alertar("Archivo cargado")
 
-    def plot(self, graph, Wview):
-        graphRoute = self.graphsRoute + "0"
+    def plot(self, graph, Wview, index):
+        if Wview == "1":
+            self.G1 = graph
+        if Wview == "2":
+            self.G2 = graph
+        graphRoute = self.graphsRoute + index
+        self.setSlider(int(self.info['size']))
         # Switch
+        print(graph)
         if graph == "FDA":
             graphRoute += "/correlacionDeFrecuencia.csv"
-            lambda: self.setSlider(10)
         if graph == "PDDR":
             graphRoute += "/perfilDePotenciaDeRetardo.csv"
         if graph == "DEDP":
@@ -119,7 +136,7 @@ class Principal(QDialog):
                     self.df = np.array(x).astype(float)
 
         buffer = io.StringIO()
-        print(self.df)
+        #print(self.df)
         fig = px.scatter(x=np.linspace(0, self.df.size-1, self.df.size), y=np.fft.fftshift(self.df))
         fig.update_layout(hovermode="x")
         fig.update_traces(mode="markers+lines", hovertemplate=None)
@@ -129,25 +146,33 @@ class Principal(QDialog):
                 font_family="Rockwell"
             )
         )
-        fast = True
+        fast = False
         if fast:
             img_bytes = fig.to_image(format="png")
             encoding = b64encode(img_bytes).decode()
             img_b64 = "data:image/png;base64," + encoding
             html = ('''
-            <html style='margin: 0; padding:0'>
+            <html>
                 <head>
                     <style>
+                        *{
+                            margin: 0;
+                            padding: 0;
+                        }
                     </style>
                 </head>
                 <body>
                     <img src="'''
                     + img_b64 + 
-                '''" style="width:100%"/>
+                '''" style="width:100%; max-height:100vh"/>
                 </body>
             </html>''')
-            self.ui.WRepG2.setHtml(html)
-            pass
+            if Wview == "1":
+                self.ui.WRepG1.setZoomFactor(1)
+                self.ui.WRepG1.setHtml(html)
+            if Wview == "2":
+                self.ui.WRepG2.setZoomFactor(1)
+                self.ui.WRepG2.setHtml(html)
         else:
             fig.write_html(buffer, include_plotlyjs='directory', full_html=False)
 
@@ -155,6 +180,10 @@ class Principal(QDialog):
             <html style='margin: 0; padding:0'>
                 <head>
                     <style>
+                        *{
+                            margin: 0;
+                            padding: 0;
+                        }
                         .modebar{
                             display: block !important;
                             margin: auto !important;
@@ -182,9 +211,12 @@ class Principal(QDialog):
             </html>''')
 
             url = QUrl(os.path.abspath(__file__).replace(os.sep, '/'))
-
-            self.ui.WRepG2.setZoomFactor(0.5)
-            self.ui.WRepG2.setHtml(html, baseUrl=url)
+            if Wview == "1":
+                self.ui.WRepG1.setZoomFactor(0.5)
+                self.ui.WRepG1.setHtml(html, baseUrl=url)
+            if Wview == "2":
+                self.ui.WRepG2.setZoomFactor(0.5)
+                self.ui.WRepG2.setHtml(html, baseUrl=url)
         
     def saveFile(self):
         options = QFileDialog.Options()
@@ -231,9 +263,11 @@ class Principal(QDialog):
             print("End")
     
     def setSlider(self,top):
+        top -= 1
         self.ui.horizontalSlider.setMinimum(0)
         self.ui.horizontalSlider.setMaximum(top)
-        self.ui.horizontalSlider.setTickInterval(2)
+        self.ui.horizontalSlider.setTickInterval(top)
+        self.ui.horizontalSlider.setTickPosition(QSlider.TicksBothSides)
 
 def main():
     app = QApplication(sys.argv)

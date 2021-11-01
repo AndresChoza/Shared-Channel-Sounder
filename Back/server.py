@@ -6,7 +6,7 @@ import threading
 import signal
 class Server(threading.Thread):
     def __init__(self):
-        threading.Thread.__init__(self)
+        threading.Thread.__init__(self, daemon=True)
  
         # The shutdown_flag is a threading.Event object that
         # indicates whether the thread should be terminated.
