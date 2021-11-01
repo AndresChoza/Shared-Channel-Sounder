@@ -1,6 +1,6 @@
 from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import *
-from PyQt5.QtCore import QUrl
+from PyQt5.QtCore import QByteArray, QUrl
 from Back.server import Server
 from VISTA.UI.ui_main import Ui_FrmMain
 from VISTA.vSettings import Vsettings
@@ -16,6 +16,7 @@ import csv
 import plotly.express as px
 import json
 import os
+from base64 import b64encode
 
 from Back import server
 class Principal(QDialog):
@@ -116,9 +117,6 @@ class Principal(QDialog):
                 for x in csv_reader:
                     self.df = np.array(x).astype(float)
 
-
-
-
         buffer = io.StringIO()
         print(self.df)
         fig = px.scatter(x=np.linspace(0, self.df.size-1, self.df.size), y=np.fft.fftshift(self.df))
@@ -130,44 +128,62 @@ class Principal(QDialog):
                 font_family="Rockwell"
             )
         )
+        fast = True
+        if fast:
+            img_bytes = fig.to_image(format="png")
+            encoding = b64encode(img_bytes).decode()
+            img_b64 = "data:image/png;base64," + encoding
+            html = ('''
+            <html style='margin: 0; padding:0'>
+                <head>
+                    <style>
+                    </style>
+                </head>
+                <body>
+                    <img src="'''
+                    + img_b64 + 
+                '''" style="width:100%"/>
+                </body>
+            </html>''')
+            self.ui.WRepG2.setHtml(html)
+            pass
+        else:
+            fig.write_html(buffer, include_plotlyjs='directory', full_html=False)
 
-        fig.write_html(buffer, include_plotlyjs='directory', full_html=False)
+            html = ('''
+            <html style='margin: 0; padding:0'>
+                <head>
+                    <style>
+                        .modebar{
+                            display: block !important;
+                            margin: auto !important;
+                            position: static !important;
+                        }
+                        .modebar-container {
+                            display: flex;
+                        }
+                        .ytick text{
+                            font-size: 1.8em !important;
+                        }
+                        .xtick text{
+                            font-size: 1.8em !important;
+                        }
+                        .modebar-btn{
+                            font-size: 2em !important;
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div style='position: fixed; width: 100%; height: 100vh; margin:0; padding:0'>'''
+                    + buffer.getvalue() + 
+                '''\n</div>
+                </body>
+            </html>''')
 
-        html = ('''
-        <html style='margin: 0; padding:0'>
-            <head>
-                <style>
-                    .modebar{
-                        display: block !important;
-                        margin: auto !important;
-                        position: static !important;
-                    }
-                    .modebar-container {
-                        display: flex;
-                    }
-                    .ytick text{
-                        font-size: 1.8em !important;
-                    }
-                    .xtick text{
-                        font-size: 1.8em !important;
-                    }
-                    .modebar-btn{
-                        font-size: 2em !important;
-                    }
-                </style>
-            </head>
-            <body>
-                <div style='position: fixed; width: 100%; height: 100vh; margin:0; padding:0'>'''
-                + buffer.getvalue() + 
-            '''\n</div>
-            </body>
-        </html>''')
+            url = QUrl(os.path.abspath(__file__).replace(os.sep, '/'))
 
-        #url = QUrl("C:/Users/Jesus/Desktop/Shared work/Channel-Sounder/imgtest.html")
-        url = QUrl(os.path.abspath(__file__).replace(os.sep, '/'))
-
-        self.ui.WRepG2.setZoomFactor(0.5)
-        self.ui.WRepG2.setHtml(html, baseUrl=url)
+            self.ui.WRepG2.setZoomFactor(0.5)
+            self.ui.WRepG2.setHtml(html, baseUrl=url)
         
     def saveFile(self):
         options = QFileDialog.Options()
