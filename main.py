@@ -1,6 +1,8 @@
+from types import coroutine
 from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import QByteArray, QUrl, Qt
+from folium.map import Tooltip
 from Back.server import Server
 from VISTA.UI.ui_main import Ui_FrmMain
 from VISTA.vSettings import Vsettings
@@ -227,32 +229,30 @@ class Principal(QDialog):
             print(fileName)
     
     def viewMap(self):
-        coordinate = (20.628269,-103.284029)
-        m = folium.Map(
-        	tiles='Stamen Terrain',
+        self.coordinate = (20.628269,-103.284029)
+        self.m = folium.Map(
+        	tiles='Stamen Toner',
         	zoom_start=15,
-        	location=coordinate
+        	location=self.coordinate
         )
-        html = "<p>Latitud: 20.628269</p><p>Longitud: -103.284029</p>"
-        iframe1 = branca.element.IFrame(html=html, width=300, height=100)
-        marcado1 = folium.Marker(location=(20.628269,-103.284029),
-        popup=folium.Popup(iframe1, max_width=300),
-        icon=folium.Icon(color="red"))
-    
-        marcado1.add_to(m)
+        #html = "<p>Latitud: 20.628269</p><p>Longitud: -103.284029</p>"
+        #iframe1 = branca.element.IFrame(html=html, width=300, height=100)
+        self.marcado = folium.Marker(location=(20.628269,-103.284029),
+        popup=self.coordinate,tooltip=Tooltip,
+        icon=folium.Icon(color="red")).add_to(self.m)
         # save map data to data object
-        data = io.BytesIO()
-        m.save(data, close_file=False)
+        self.data = io.BytesIO()
+        self.m.save(self.data, close_file=False)
         #switch(self.ui.)
         
         if self.ui.rBtnMapRec1.isChecked():
-            self.ui.WRecG1.setHtml(data.getvalue().decode())
+            self.ui.WRecG1.setHtml(self.data.getvalue().decode())
         if self.ui.rBtnMapRec2.isChecked():
-            self.ui.WRecG2.setHtml(data.getvalue().decode())
+            self.ui.WRecG2.setHtml(self.data.getvalue().decode())
         if self.ui.rBtnMapRep1.isChecked():
-            self.ui.WRepG1.setHtml(data.getvalue().decode())
+            self.ui.WRepG1.setHtml(self.data.getvalue().decode())
         if self.ui.rBtnMapRep2.isChecked():
-            self.ui.WRepG2.setHtml(data.getvalue().decode())
+            self.ui.WRepG2.setHtml(self.data.getvalue().decode())
         #self.addWidget(webView)
 
     def StartSesion(self):
