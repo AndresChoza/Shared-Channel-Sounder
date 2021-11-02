@@ -17,6 +17,7 @@ import plotly.express as px
 import json
 import os
 from base64 import b64encode
+import branca
 
 from Back import server
 class Principal(QDialog):
@@ -232,7 +233,13 @@ class Principal(QDialog):
         	zoom_start=15,
         	location=coordinate
         )
-
+        html = "<p>Latitud: 20.628269</p><p>Longitud: -103.284029</p>"
+        iframe1 = branca.element.IFrame(html=html, width=300, height=100)
+        marcado1 = folium.Marker(location=(20.628269,-103.284029),
+        popup=folium.Popup(iframe1, max_width=300),
+        icon=folium.Icon(color="red"))
+    
+        marcado1.add_to(m)
         # save map data to data object
         data = io.BytesIO()
         m.save(data, close_file=False)
@@ -250,6 +257,9 @@ class Principal(QDialog):
 
     def StartSesion(self):
         if not self.status:
+            self.name, self.estado = QInputDialog.getText(self,"Sesion", "Nombre de la Sesion:")
+            if self.name and self.estado != '' : 
+                print('Nombre:', self.name)
             self.status = True
             self.serv = Server()
             self.serv.start()
@@ -259,6 +269,7 @@ class Principal(QDialog):
             self.serv.shutdown_flag.set()
             self.serv.join()
             self.ui.btnRec.setStyleSheet("border-image: url(:/botones/BotonRec.jpg);")
+            self.alertar("Sesion Finalizada")
 
             print("End")
     
