@@ -17,61 +17,63 @@ class Gps(threading.Thread):
         self.data_lock.release()
     
     def run(self):
-        ser = serial.Serial('COM3', 9600, timeout=1)
-        ser.flushInput()
-        print("gps listening")
-        while not self.shutdown_flag.is_set():
-            try:
-                ser_bytes = ser.readline()
-                decoded_bytes = ser_bytes[0:len(ser_bytes)-2].decode("utf-8")
-                splited_decoded = decoded_bytes.split(',')
-                if splited_decoded[0] == '$GNRMC':
-                    type = splited_decoded[0]
-                    time = splited_decoded[1]
-                    self.state = True if splited_decoded[2]=="A" else False
-                    latitude = splited_decoded[3]
-                    longitude = splited_decoded[5]
-                    
-                    if self.state:
-                        dotLa = latitude.find('.')
-                        dotLo = longitude.find('.')
-
-                        latitudeGrados = latitude[:dotLa-2]
-                        longitudeGrados = longitude[:dotLo-2]
-
-                        latiudeMinutos = latitude[dotLa-2:]
-                        longitudeMinutos = longitude[dotLo-2:]
-
-                        #latiudeMinutos = str(float64(latiudeMinutos)/60)
-                        #longitudeMinutos = str(float64(longitudeMinutos)/60)
-
-                        latitude = latitudeGrados + " " + latiudeMinutos
-                        longitude = longitudeGrados + " " + longitudeMinutos
-
-                        if splited_decoded[4] == "S":
-                            latitude = "-" + latitude
-                        if splited_decoded[6] == "W":
-                            longitude = "-" + longitude
-                        print(f"({latitude}, {longitude})")
-                        #print(decoded_bytes)
-                        self.data_lock.acquire()
-                        self.ActualLatitude = latitude
-                        self.ActualLongitude = longitude
-                        self.data_lock.release()
-                    else:
-                        print("No gps signal\t", end='')
-                        print(decoded_bytes)
-                
-            except ValueError:
-                print(ValueError)
-                print("Keyboard Interrupt")
-                break
-        print("gps off")
-    def getPosition(self):
-        if self.state:
-            return (self.ActualLatitude, self.ActualLongitude)
+        try:
+            ser = serial.Serial('COM3', 9600, timeout=1)
+            ser.flushInput()
+            print("gps listening")
+        except:
+            print("cant not connect to the gps via COM3")
         else:
-            return False
+            while not self.shutdown_flag.is_set():
+                try:
+                    ser_bytes = ser.readline()
+                    decoded_bytes = ser_bytes[0:len(ser_bytes)-2].decode("utf-8")
+                    splited_decoded = decoded_bytes.split(',')
+                    if splited_decoded[0] == '$GNRMC':
+                        type = splited_decoded[0]
+                        time = splited_decoded[1]
+                        self.state = True if splited_decoded[2]=="A" else False
+                        latitude = splited_decoded[3]
+                        longitude = splited_decoded[5]
+                        
+                        if self.state:
+                            dotLa = latitude.find('.')
+                            dotLo = longitude.find('.')
+
+                            latitudeGrados = latitude[:dotLa-2]
+                            longitudeGrados = longitude[:dotLo-2]
+
+                            latiudeMinutos = latitude[dotLa-2:]
+                            longitudeMinutos = longitude[dotLo-2:]
+
+                            #latiudeMinutos = str(float64(latiudeMinutos)/60)
+                            #longitudeMinutos = str(float64(longitudeMinutos)/60)
+
+                            latitude = latitudeGrados + " " + latiudeMinutos
+                            longitude = longitudeGrados + " " + longitudeMinutos
+
+                            if splited_decoded[4] == "S":
+                                latitude = "-" + latitude
+                            if splited_decoded[6] == "W":
+                                longitude = "-" + longitude
+                            print(f"({latitude}, {longitude})")
+                            #print(decoded_bytes)
+                            self.data_lock.acquire()
+                            self.ActualLatitude = latitude
+                            self.ActualLongitude = longitude
+                            self.data_lock.release()
+                        else:
+                            print("No gps signal\t", end='')
+                            print(decoded_bytes)
+                    
+                except ValueError:
+                    print(ValueError)
+                    print("Keyboard Interrupt")
+                    break
+            print("gps off")
+
+    def getPosition(self):
+        return (self.ActualLatitude, self.ActualLongitude)
 
 class ServiceExit(Exception):
     """
