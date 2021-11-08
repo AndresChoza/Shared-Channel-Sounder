@@ -4,10 +4,12 @@ import numpy as np
 from . import controller
 import threading
 import signal
+from .gps import Gps
 class Server(threading.Thread):
     def __init__(self):
         threading.Thread.__init__(self, daemon=True)
- 
+        self.gpsObject = Gps()
+        self.gpsObject.start()
         # The shutdown_flag is a threading.Event object that
         # indicates whether the thread should be terminated.
         self.shutdown_flag = threading.Event()
@@ -60,9 +62,11 @@ class Server(threading.Thread):
                     header = fullmessage[:32].decode("utf-8").split(';')
                     message = np.frombuffer(fullmessage[32:], dtype=eval(header[0])).reshape(eval(header[1]))
                     print('time to get the data: ', time.time() - start)
-                    operationController.makeOp(message)
+                    operationController.makeOp(message, self.gpsObject.getPosition())
                     # Clean up the connection
                     connection.close()
+        self.gpsObject.shutdown_flag.set()
+        self.gpsObject.join()
         if start_flag:
             operationController.close()
         print("Fin thread")

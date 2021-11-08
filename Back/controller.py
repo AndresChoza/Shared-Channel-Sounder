@@ -18,13 +18,6 @@ class sesion_header:
         self.name = name
         self.size = size
         self.dir = dir
-class Coordenates:
-    def __init__(self):
-        self.latitude = 20.6
-        self.longitude = -103.1
-    def getPosition(self):
-        self.longitude -= 0.001
-        return (self.latitude,self.longitude)
 class controller:
 
     def __init__(self):
@@ -32,9 +25,8 @@ class controller:
         self.date = datetime.today().strftime('%Y-%m-%d %H.%M')
         self.dir = "./Saves/" + self.date + "/"
         print(self.date)
-        self.c = Coordenates()
 
-    def makeOp(self, h):
+    def makeOp(self, h, coord):
         # Perfil de potencia de retardo
         startC = time.time()
         start = time.time()
@@ -70,7 +62,7 @@ class controller:
             os.makedirs(dir)
 
         text_file = open(dir + "/header.json", "w")
-        text_file.write(json.dumps(head(self.c.getPosition()).__dict__))
+        text_file.write(json.dumps(head(coord).__dict__))
         text_file.close()
 
         np.savetxt(dir + "/perfilDePotenciaDeRetardo.csv", [PDDR], fmt='% s', delimiter=',', newline='\n')
