@@ -1,6 +1,6 @@
 from numpy import float64
 import serial
-from serial.serialutil import XOFF
+#from serial.serialutil import XOFF
 import threading
 import signal
 import time
