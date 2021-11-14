@@ -1,5 +1,7 @@
 # Shared-Channel-Sounder
 
+Use python 3.9.6
+
 <b>In order to run the app install the following:</b>
 <ul>
   <span>pip install PyQt5</span></br>
