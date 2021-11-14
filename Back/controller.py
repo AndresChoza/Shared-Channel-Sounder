@@ -14,16 +14,18 @@ class head:
         self.time = datetime.today().strftime('%Y-%m-%d %H:%M:%f')
         self.possition = pos
 class sesion_header:
-    def __init__(self, name, size, dir):
+    def __init__(self, name, size, dir, pos):
         self.name = name
         self.size = size
         self.dir = dir
+        self.coordenates = pos
 class controller:
 
     def __init__(self):
         self.count = 0
         self.date = datetime.today().strftime('%Y-%m-%d %H.%M')
         self.dir = "./Saves/" + self.date + "/"
+        self.positions = []
         print(self.date)
 
     def makeOp(self, h, coord):
@@ -64,6 +66,7 @@ class controller:
         text_file = open(dir + "/header.json", "w")
         text_file.write(json.dumps(head(coord).__dict__))
         text_file.close()
+        self.positions.append(coord)
 
         np.savetxt(dir + "/perfilDePotenciaDeRetardo.csv", [PDDR], fmt='% s', delimiter=',', newline='\n')
         np.savetxt(dir + "/funcionDeDispersion.csv", FDD, fmt='% s', delimiter=',', newline='\n')
@@ -78,7 +81,7 @@ class controller:
         print("Closing the sesion")
 
         text_file = open("./Saves/" + self.date + ".json", "w")
-        text_file.write(json.dumps(sesion_header(self.date, self.count, "/"+self.date+"/").__dict__))
+        text_file.write(json.dumps(sesion_header(self.date, self.count, "/"+self.date+"/", self.positions).__dict__))
         text_file.close()
 
         print("Making the average graphs...")

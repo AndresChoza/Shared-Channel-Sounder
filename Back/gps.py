@@ -46,11 +46,11 @@ class Gps(threading.Thread):
                             latiudeMinutos = latitude[dotLa-2:]
                             longitudeMinutos = longitude[dotLo-2:]
 
-                            #latiudeMinutos = str(float64(latiudeMinutos)/60)
-                            #longitudeMinutos = str(float64(longitudeMinutos)/60)
+                            latiudeMinutos = str(float(latiudeMinutos)/60)
+                            longitudeMinutos = str(float(longitudeMinutos)/60)
 
-                            latitude = latitudeGrados + " " + latiudeMinutos
-                            longitude = longitudeGrados + " " + longitudeMinutos
+                            latitude = latitudeGrados + latiudeMinutos[1:]
+                            longitude = longitudeGrados + longitudeMinutos[1:]
 
                             if splited_decoded[4] == "S":
                                 latitude = "-" + latitude

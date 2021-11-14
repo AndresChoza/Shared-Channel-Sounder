@@ -110,7 +110,11 @@ class Principal(QDialog):
             print ("Dirección",filePath) 
             self.info = json.load(open(filePath))
             self.graphsRoute = os.path.dirname(filePath) + self.info['dir']
-            print(self.info)
+            #print(self.info)
+            self.coordinates = []
+            for c in self.info['coordenates']:
+                self.coordinates.append((float(c[0]), float(c[1])))
+            print(self.coordinates)
             self.alertar("Archivo cargado")
 
     def plot(self, graph, Wview, index):
@@ -229,7 +233,7 @@ class Principal(QDialog):
             print(fileName)
     
     def viewMap(self):
-        self.coordinate = (20.628269,-103.284029)
+        self.coordinate = self.coordinates[0]
         self.m = folium.Map(
         	tiles='Stamen Toner',
         	zoom_start=15,
@@ -237,9 +241,10 @@ class Principal(QDialog):
         )
         #html = "<p>Latitud: 20.628269</p><p>Longitud: -103.284029</p>"
         #iframe1 = branca.element.IFrame(html=html, width=300, height=100)
-        self.marcado = folium.Marker(location=(20.628269,-103.284029),
-        popup=self.coordinate,tooltip=Tooltip,
-        icon=folium.Icon(color="red")).add_to(self.m)
+        for coord in self.coordinates:
+            self.marcado = folium.Marker(location=coord,
+            popup=self.coordinate,tooltip=Tooltip,
+            icon=folium.Icon(color="red")).add_to(self.m)
         # save map data to data object
         self.data = io.BytesIO()
         self.m.save(self.data, close_file=False)
