@@ -21,7 +21,9 @@ class Server(threading.Thread):
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
         # Bind the socket to the port
-        server_address = ('localhost', 10000)
+        hostname = socket.gethostname()
+        local_ip = socket.gethostbyname(hostname)
+        server_address = (local_ip, 10000)
         print('starting up on {} port {}'.format(*server_address))
         sock.bind(server_address)
         sock.settimeout(1)
