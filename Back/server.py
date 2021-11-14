@@ -23,7 +23,7 @@ class Server(threading.Thread):
         # Bind the socket to the port
         hostname = socket.gethostname()
         local_ip = socket.gethostbyname(hostname)
-        server_address = (local_ip, 10000)
+        server_address = ('localhost', 10000)
         print('starting up on {} port {}'.format(*server_address))
         sock.bind(server_address)
         sock.settimeout(1)
