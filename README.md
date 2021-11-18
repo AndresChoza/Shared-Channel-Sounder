@@ -8,7 +8,7 @@ Use python 3.9.6
   <span>pip install folium</span></br>
   <span>pip install matplotlib</span></br>
   <span>pip install tqdm</span></br>
-  <span>pip install serial</span></br>
+  <span>pip install pyserial</span></br>
   <span>pip install PyQtWebEngine</span></br>
   <span>pip install pandas</span></br>
   <span>pip install plotly</span></br>
