@@ -51,7 +51,7 @@ class Principal(QDialog):
 
         #Botones REC Grafica 1
 
-        self.ui.rBtnMapRec1.clicked.connect(self.viewMap)
+        self.ui.rBtnMapRec1.clicked.connect(lambda: self.viewMap("0"))
         self.ui.rBtnPDDRRec1.clicked.connect(lambda: self.alertar("Elemento en contruccion"))
         self.ui.rBtnFDDRec1.clicked.connect(lambda: self.alertar("Elemento en contruccion"))
         self.ui.rBtnFDARec1.clicked.connect(lambda: self.alertar("Elemento en contruccion")) 
@@ -60,7 +60,7 @@ class Principal(QDialog):
 
         #Botones REC Grafica 2
 
-        self.ui.rBtnMapRec2.clicked.connect(self.viewMap)
+        self.ui.rBtnMapRec2.clicked.connect(lambda: self.viewMap("0"))
         self.ui.rBtnPDDRRec2.clicked.connect(lambda: self.alertar("Elemento en contruccion"))
         self.ui.rBtnFDDRec2.clicked.connect(lambda: self.alertar("Elemento en contruccion"))
         self.ui.rBtnFDARec2.clicked.connect(lambda: self.alertar("Elemento en contruccion")) 
@@ -69,7 +69,7 @@ class Principal(QDialog):
 
         #Botones Replay Grafica 1
 
-        self.ui.rBtnMapRep1.clicked.connect(self.viewMap) 
+        self.ui.rBtnMapRep1.clicked.connect(lambda: self.viewMap("0")) 
         self.ui.rBtnPDDRRep1.clicked.connect(lambda: self.plot("PDDR", "1", "0"))
         self.ui.rBtnFDDRep1.clicked.connect(lambda: self.plot("FDD", "1", "0"))
         self.ui.rBtnFDARep1.clicked.connect(lambda: self.plot("FDA", "1", "0")) 
@@ -78,7 +78,7 @@ class Principal(QDialog):
 
         #Botones Replay Grafica 2
 
-        self.ui.rBtnMapRep2.clicked.connect(self.viewMap)
+        self.ui.rBtnMapRep2.clicked.connect(lambda: self.viewMap("0"))
         self.ui.rBtnPDDRRep2.clicked.connect(lambda: self.plot("PDDR", "2", "0"))
         self.ui.rBtnFDDRep2.clicked.connect(lambda: self.plot("FDD", "2", "0"))
         self.ui.rBtnFDARep2.clicked.connect(lambda: self.plot("FDA", "2", "0")) 
@@ -88,13 +88,18 @@ class Principal(QDialog):
         self.ui.horizontalSlider.valueChanged.connect(self.valuechange)
 
         self.show()
+
     def valuechange(self):
         size = self.ui.horizontalSlider.value()
         print(size, self.G1, self.G2)
-        if self.G1 != "none":
+        if self.G1 != "none" and self.G1 != "MAP":
             self.plot(self.G1, "1", str(size))
-        if self.G2 != "none":
+        if self.G1 == "MAP":
+            self.viewMap(str(size))
+        if self.G2 != "none" and self.G2 != "MAP":
             self.plot(self.G2, "2", str(size))
+        if self.G2 == "MAP":
+             self.viewMap(str(size))
 
     def alertar(self,texto):
         mensaje = QMessageBox(self)
@@ -111,10 +116,12 @@ class Principal(QDialog):
             self.info = json.load(open(filePath))
             self.graphsRoute = os.path.dirname(filePath) + self.info['dir']
             #print(self.info)
+            self.setSlider(int(self.info['size']))
             self.coordinates = []
             for c in self.info['coordenates']:
-                self.coordinates.append((float(c[0]), float(c[1])))
+                self.coordinates.append(tuple([float(c[0]), float(c[1])]))
             print(self.coordinates)
+            print(len(self.coordinates))
             self.alertar("Archivo cargado")
 
     def plot(self, graph, Wview, index):
@@ -123,7 +130,7 @@ class Principal(QDialog):
         if Wview == "2":
             self.G2 = graph
         graphRoute = self.graphsRoute + index
-        self.setSlider(int(self.info['size']))
+        #self.setSlider(int(self.info['size']))
         # Switch
         print(graph)
         if graph == "FDA":
@@ -232,20 +239,24 @@ class Principal(QDialog):
         if fileName:
             print(fileName)
     
-    def viewMap(self):
-        self.coordinate = self.coordinates[0]
+    def viewMap(self, point):
+        self.fpoint = self.coordinates[int(point)]
         self.m = folium.Map(
-        	tiles='Stamen Toner',
+        	tiles=#'Stamen Toner'
+            'Stamen Terrain',
         	zoom_start=15,
-        	location=self.coordinate
+        	location= self.fpoint
         )
+        print(int(point))
         #html = "<p>Latitud: 20.628269</p><p>Longitud: -103.284029</p>"
         #iframe1 = branca.element.IFrame(html=html, width=300, height=100)
-        for coord in self.coordinates:
-            self.marcado = folium.Marker(location=coord,
-            popup=self.coordinate,tooltip=Tooltip,
-            icon=folium.Icon(color="red")).add_to(self.m)
+        #for point in self.coordinates:
+        self.marcado = folium.Marker(location=self.coordinates[int(point)],
+        popup=self.coordinates[int(point)],tooltip=Tooltip,
+        icon=folium.Icon(color="red")).add_to(self.m)
+        folium.PolyLine(self.coordinates, color="yellow", weight=3, opacity=1).add_to(self.m)
         # save map data to data object
+        
         self.data = io.BytesIO()
         self.m.save(self.data, close_file=False)
         #switch(self.ui.)
@@ -256,8 +267,10 @@ class Principal(QDialog):
             self.ui.WRecG2.setHtml(self.data.getvalue().decode())
         if self.ui.rBtnMapRep1.isChecked():
             self.ui.WRepG1.setHtml(self.data.getvalue().decode())
+            self.G1 = "MAP"
         if self.ui.rBtnMapRep2.isChecked():
             self.ui.WRepG2.setHtml(self.data.getvalue().decode())
+            self.G2 = "MAP"
         #self.addWidget(webView)
 
     def StartSesion(self):
