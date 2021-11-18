@@ -6,17 +6,17 @@ import threading
 import signal
 from .gps import Gps
 class Server(threading.Thread):
-    def __init__(self):
+    def __init__(self, name):
         threading.Thread.__init__(self, daemon=True)
         self.gpsObject = Gps()
         self.gpsObject.start()
         # The shutdown_flag is a threading.Event object that
         # indicates whether the thread should be terminated.
         self.shutdown_flag = threading.Event()
+        self.name = name
     
     def run(self):
         start_flag = False
-        operationController = controller.controller()
         # Create a TCP/IP socket
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
@@ -36,7 +36,10 @@ class Server(threading.Thread):
             try:
                 print('waiting for a connection')
                 connection, client_address = sock.accept()
-                start_flag = True
+                if not start_flag:
+                    operationController = controller.controller(self.name)
+                    start_flag = True
+                
             except:
                 pass
             else:
