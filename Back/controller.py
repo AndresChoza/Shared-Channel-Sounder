@@ -23,8 +23,10 @@ class controller:
 
     def __init__(self, name):
         self.count = 0
-        # self.date = datetime.today().strftime('%Y-%m-%d %H.%M')
-        self.date = name
+        if name == '':
+            self.date = datetime.today().strftime('%Y-%m-%d %H.%M')
+        else:
+            self.date = name
         self.dir = "./Saves/" + self.date + "/"
         self.positions = []
         print(self.date)
