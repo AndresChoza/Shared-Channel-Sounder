@@ -21,9 +21,12 @@ class sesion_header:
         self.coordenates = pos
 class controller:
 
-    def __init__(self):
+    def __init__(self, name):
         self.count = 0
-        self.date = datetime.today().strftime('%Y-%m-%d %H.%M')
+        if name == '':
+            self.date = datetime.today().strftime('%Y-%m-%d %H.%M')
+        else:
+            self.date = name
         self.dir = "./Saves/" + self.date + "/"
         self.positions = []
         print(self.date)

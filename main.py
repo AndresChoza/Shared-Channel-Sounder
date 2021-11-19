@@ -20,6 +20,7 @@ import json
 import os
 from base64 import b64encode
 import branca
+import plotly.graph_objects as go
 
 from Back import server
 class Principal(QDialog):
@@ -140,25 +141,32 @@ class Principal(QDialog):
             graphRoute += "/densidadEspectralDePotencia.csv"
         if graph == "FDD":
             graphRoute += "/funcionDeDispersion.csv"
+
         if graph == "FDCT":
             graphRoute += "/correlacionTemporal.csv"
-        
-        with open(graphRoute) as csv_file:
-                csv_reader = csv.reader(csv_file, delimiter=',')
-                for x in csv_reader:
-                    self.df = np.array(x).astype(float)
 
         buffer = io.StringIO()
         #print(self.df)
-        fig = px.scatter(x=np.linspace(0, self.df.size-1, self.df.size), y=np.fft.fftshift(self.df))
-        fig.update_layout(hovermode="x")
-        fig.update_traces(mode="markers+lines", hovertemplate=None)
-        fig.update_layout(
-            hoverlabel=dict(
-                font_size=50,
-                font_family="Rockwell"
+        if graph != "FDD":
+            with open(graphRoute) as csv_file:
+                csv_reader = csv.reader(csv_file, delimiter=',')
+                for x in csv_reader:
+                    self.df = np.array(x).astype(float)
+            fig = px.scatter(x=np.linspace(0, self.df.size-1, self.df.size), y=np.fft.fftshift(self.df))
+            fig.update_layout(hovermode="x")
+            fig.update_traces(mode="markers+lines", hovertemplate=None)
+            fig.update_layout(
+                hoverlabel=dict(
+                    font_size=50,
+                    font_family="Rockwell"
+                )
             )
-        )
+        else:
+            z_data = pd.read_csv(graphRoute)
+            fig = go.Figure(data=[go.Surface(z=np.fft.fftshift(z_data.values, axes=0))])
+            fig.update_layout(title='', autosize=True,
+                  width=800, height=500,
+                  margin=dict(l=65, r=50, b=65, t=90))
         fast = False
         if fast:
             img_bytes = fig.to_image(format="png")
@@ -217,7 +225,7 @@ class Principal(QDialog):
                     </style>
                 </head>
                 <body>
-                    <div style='position: fixed; width: 100%; height: 100vh; margin:0; padding:0'>'''
+                    <div style='position: fixed; width: 100%; height: 100vh; margin:0; padding:0; display:flex; justify-content:center'>'''
                     + buffer.getvalue() + 
                 '''\n</div>
                 </body>
@@ -278,7 +286,7 @@ class Principal(QDialog):
             if self.name and self.estado != '' : 
                 print('Nombre:', self.name)
             self.status = True
-            self.serv = Server()
+            self.serv = Server(self.name)
             self.serv.start()
             self.ui.btnRec.setStyleSheet("border-image: url(:/botones/BotonStop.jpg);")
         else:
