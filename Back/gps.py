@@ -18,11 +18,12 @@ class Gps(threading.Thread):
     
     def run(self):
         try:
-            ser = serial.Serial('COM3', 9600, timeout=1)
+            ser = serial.Serial('COM5', 9600, timeout=2)
             ser.flushInput()
             print("gps listening")
-        except:
+        except Exception as e:
             print("cant not connect to the gps via COM3")
+            print(e)
         else:
             while not self.shutdown_flag.is_set():
                 try:
