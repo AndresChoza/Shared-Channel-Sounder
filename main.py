@@ -116,13 +116,12 @@ class Principal(QDialog):
             print ("Dirección",filePath) 
             self.info = json.load(open(filePath))
             self.graphsRoute = os.path.dirname(filePath) + self.info['dir']
-            #print(self.info)
+            print(self.graphsRoute)
             self.setSlider(int(self.info['size']))
             self.coordinates = []
             for c in self.info['coordenates']:
                 self.coordinates.append(tuple([float(c[0]), float(c[1])]))
-            print(self.coordinates)
-            print(len(self.coordinates))
+            #print(self.coordinates)
             self.alertar("Archivo cargado")
 
     def plot(self, graph, Wview, index):
@@ -250,7 +249,7 @@ class Principal(QDialog):
     def viewMap(self, point):
         self.fpoint = self.coordinates[int(point)]
         self.m = folium.Map(
-        	tiles=#'Stamen Toner'
+        	tiles=#'Stamen Toner',
             'Stamen Terrain',
         	zoom_start=15,
         	location= self.fpoint
