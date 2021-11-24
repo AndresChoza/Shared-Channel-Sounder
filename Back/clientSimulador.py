@@ -16,6 +16,7 @@ from tqdm import tqdm
 
 #Dosificar Realizaciones
 # Create a TCP/IP socket
+
 ip = input()
 server_address = (ip, 10000)
 print("reading data...")
