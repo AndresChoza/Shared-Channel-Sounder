@@ -3,6 +3,7 @@ from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import QByteArray, QUrl, Qt
 from folium.map import Tooltip
+from numpy.core.fromnumeric import size
 from Back.server import Server
 from VISTA.UI.ui_main import Ui_FrmMain
 from VISTA.vSettings import Vsettings
@@ -125,6 +126,7 @@ class Principal(QDialog):
             self.alertar("Archivo cargado")
 
     def plot(self, graph, Wview, index):
+        Fs = 5e6
         if Wview == "1":
             self.G1 = graph
         if Wview == "2":
@@ -146,13 +148,13 @@ class Principal(QDialog):
             graphRoute += "/correlacionTemporal.csv"
 
         buffer = io.StringIO()
-        #print(self.df)
-        if graph != "FDD":
+        
+        if graph == "FDA":
             with open(graphRoute) as csv_file:
                 csv_reader = csv.reader(csv_file, delimiter=',')
                 for x in csv_reader:
-                    self.df = np.array(x).astype(float)
-            fig = px.scatter(x=np.linspace(0, self.df.size-1, self.df.size), y=np.fft.fftshift(self.df))
+                    df = np.array(x).astype(float)
+            fig = px.scatter(x=np.linspace(-Fs/2, Fs/2 - Fs/df.size, df.size), y=np.roll(df, int(df.size/2)))
             fig.update_layout(hovermode="x")
             fig.update_traces(mode="markers+lines", hovertemplate=None)
             fig.update_layout(
@@ -161,12 +163,148 @@ class Principal(QDialog):
                     font_family="Rockwell"
                 )
             )
-        else:
+            fig.update_xaxes(
+                title="Δf",
+                titlefont=dict(
+                    size=30
+                ),
+                tickfont = dict(
+                    size= 25
+                ), 
+            )
+            fig.update_yaxes(
+                title="Índice",
+                titlefont=dict(
+                    size=30
+                ),
+                tickfont = dict(
+                    size= 25
+                )
+            )
+        if graph == "PDDR":
+            with open(graphRoute) as csv_file:
+                csv_reader = csv.reader(csv_file, delimiter=',')
+                for x in csv_reader:
+                    df = np.array(x).astype(float)
+            fig = px.scatter(x=np.linspace(0, 1/Fs, df.size), y=df)
+            fig.update_layout(hovermode="x")
+            fig.update_traces(mode="markers+lines", hovertemplate=None)
+            fig.update_layout(
+                hoverlabel=dict(
+                    font_size=50,
+                    font_family="Rockwell"
+                )
+            )
+            fig.update_xaxes(
+                title="Retardos",
+                titlefont=dict(
+                    size=30
+                ),
+                showexponent = 'all',
+                tickformat = '.0e',
+                rangemode = 'tozero',
+                tickfont = dict(
+                    size= 25
+                ), 
+                tickangle=30
+            )
+            fig.update_yaxes(
+                title="Potencia Normalizada",
+                titlefont=dict(
+                    size=30
+                ),
+                tickfont = dict(
+                    size= 25
+                )
+            )
+        if graph == "DEDP":
+            with open(graphRoute) as csv_file:
+                csv_reader = csv.reader(csv_file, delimiter=',')
+                for x in csv_reader:
+                    df = np.array(x).astype(float)
+            fig = px.scatter(x=np.linspace(-Fs/2, Fs/2 - 1, df.size), y=np.roll(df, int(df.size/2)) + 1, log_y=True)
+            fig.update_layout(hovermode="x")
+            fig.update_traces(mode="markers+lines", hovertemplate=None)
+            fig.update_layout(
+                hoverlabel=dict(
+                    font_size=50,
+                    font_family="Rockwell"
+                )
+            )
+            fig.update_xaxes(
+                title="Hz",
+                titlefont=dict(
+                    size=30
+                ),
+                tickfont = dict(
+                    size= 25
+                ), 
+            )
+            fig.update_yaxes(
+                title="dB/Hz",
+                titlefont=dict(
+                    size=30
+                ),
+                tickfont = dict(
+                    size= 25
+                )
+            )
+        if graph == "FDCT":
+            with open(graphRoute) as csv_file:
+                csv_reader = csv.reader(csv_file, delimiter=',')
+                for x in csv_reader:
+                    df = np.array(x).astype(float)
+            fig = px.scatter(x=np.linspace(0, Fs-1, df.size), y=np.fft.fftshift(df))
+            fig.update_layout(hovermode="x")
+            fig.update_traces(mode="markers+lines", hovertemplate=None)
+            fig.update_layout(
+                hoverlabel=dict(
+                    font_size=50,
+                    font_family="Rockwell"
+                )
+            )
+            fig.update_xaxes(
+                title="",
+                titlefont=dict(
+                    size=30
+                ),
+                tickfont = dict(
+                    size= 25
+                ), 
+            )
+            fig.update_yaxes(
+                title="Correlación normalizada",
+                titlefont=dict(
+                    size=30
+                ),
+                tickfont = dict(
+                    size= 25
+                )
+            )
+        if graph == "FDD":
             z_data = pd.read_csv(graphRoute)
-            fig = go.Figure(data=[go.Surface(z=np.fft.fftshift(z_data.values, axes=0))])
-            fig.update_layout(title='', autosize=True,
-                  width=800, height=500,
-                  margin=dict(l=65, r=50, b=65, t=90))
+            fig = go.Figure(
+                data=[
+                    go.Surface(z=np.fft.fftshift(z_data.values, axes=0), x = np.linspace(0, int(z_data.shape[1]), int(z_data.shape[1])+1), y = np.linspace(-(int(z_data.shape[0])+1)/2, (int(z_data.shape[0])+1)/2, int(z_data.shape[0])+1))
+                    ]
+                )
+            fig.update_layout(
+                    title='', autosize=True,
+                    width=850, height=550,
+                    margin=dict(l=65, r=50, b=65, t=90),
+                    xaxis=dict(
+                        title="x_value",
+                        titlefont=dict(
+                            size=40
+                        )
+                    ),
+                    yaxis=dict(
+                        title="y_value",
+                        titlefont=dict(
+                            size=40
+                        )
+                    )
+                )
         fast = False
         if fast:
             img_bytes = fig.to_image(format="png")
@@ -213,12 +351,6 @@ class Principal(QDialog):
                         .modebar-container {
                             display: flex;
                         }
-                        .ytick text{
-                            font-size: 1.8em !important;
-                        }
-                        .xtick text{
-                            font-size: 1.8em !important;
-                        }
                         .modebar-btn{
                             font-size: 2em !important;
                         }
@@ -230,7 +362,9 @@ class Principal(QDialog):
                 '''\n</div>
                 </body>
             </html>''')
-
+            f = open("graph.html", "w")
+            f.write(html)
+            f.close()
             url = QUrl(os.path.abspath(__file__).replace(os.sep, '/'))
             if Wview == "1":
                 self.ui.WRepG1.setZoomFactor(0.5)

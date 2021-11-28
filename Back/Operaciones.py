@@ -71,7 +71,7 @@ def FDD(h):
     for i in range(len(h2)):
         h2[i] = h[i].T
         for j in range(len(h2[i])):
-            h2[i][j] = numpy.fft.fft(h2[i][j])
+            h2[i][j] = numpy.fft.fft(h2[i][j], norm="ortho")
         tempAbs = numpy.abs(h2[i])
         tempAbs = tempAbs*tempAbs
         Ret2 += tempAbs
@@ -89,7 +89,7 @@ def DEDP(h): # h debe ser funcion de dispercion
     return p
 # Funcion de correlacion temporal
 def FCT(h): #h debe ser la densidad espectral de potencia
-    H = numpy.fft.ifft(h).real
+    H = numpy.fft.ifft(h, norm="ortho").real
     return H
 # Funcion de correlacion frecuencia
 def FDA(h):

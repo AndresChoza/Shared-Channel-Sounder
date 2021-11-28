@@ -1,4 +1,4 @@
 from clientSimulador3 import NewClient
 
-x = NewClient(1500, 20e6, 1024)
+x = NewClient(Fmax = 20000, Fs = 5e6, N = 1024)
 x.start()
