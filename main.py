@@ -1,3 +1,4 @@
+from logging import setLogRecordFactory 
 from types import coroutine
 from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import *
@@ -22,6 +23,9 @@ import os
 from base64 import b64encode
 import branca
 import plotly.graph_objects as go
+from jinja2 import Template
+import time 
+import threading
 
 from Back import server
 class Principal(QDialog):
@@ -31,7 +35,8 @@ class Principal(QDialog):
         self.status = False
         self.G1 = "none"
         self.G2 = "none"
-
+        self.webView1 = QWebEngineView()
+        self.webView2 = QWebEngineView()
         self.inicializar_gui()
     
     def inicializar_gui(self):
@@ -47,13 +52,13 @@ class Principal(QDialog):
         self.ui.pushButton_4.clicked.connect(self.saveFile)
 
         #Botones Generales Replay
-        self.ui.btnPlay.clicked.connect(lambda: self.alertar("Elemento en contruccion"))
-        self.ui.btnPause.clicked.connect(lambda: self.alertar("Elemento en contruccion"))
+        self.ui.btnPlay.clicked.connect(self.playGraph)
+        self.ui.btnPause.clicked.connect(self.stopGraph)
         self.ui.btnOpenFile.clicked.connect(self.getCSV)
 
         #Botones REC Grafica 1
 
-        self.ui.rBtnMapRec1.clicked.connect(lambda: self.viewMap("0"))
+        self.ui.rBtnMapRec1.clicked.connect(self.viewMap)
         self.ui.rBtnPDDRRec1.clicked.connect(lambda: self.alertar("Elemento en contruccion"))
         self.ui.rBtnFDDRec1.clicked.connect(lambda: self.alertar("Elemento en contruccion"))
         self.ui.rBtnFDARec1.clicked.connect(lambda: self.alertar("Elemento en contruccion")) 
@@ -62,7 +67,7 @@ class Principal(QDialog):
 
         #Botones REC Grafica 2
 
-        self.ui.rBtnMapRec2.clicked.connect(lambda: self.viewMap("0"))
+        self.ui.rBtnMapRec2.clicked.connect(self.viewMap)
         self.ui.rBtnPDDRRec2.clicked.connect(lambda: self.alertar("Elemento en contruccion"))
         self.ui.rBtnFDDRec2.clicked.connect(lambda: self.alertar("Elemento en contruccion"))
         self.ui.rBtnFDARec2.clicked.connect(lambda: self.alertar("Elemento en contruccion")) 
@@ -71,7 +76,7 @@ class Principal(QDialog):
 
         #Botones Replay Grafica 1
 
-        self.ui.rBtnMapRep1.clicked.connect(lambda: self.viewMap("0")) 
+        self.ui.rBtnMapRep1.clicked.connect(self.viewMap) 
         self.ui.rBtnPDDRRep1.clicked.connect(lambda: self.plot("PDDR", "1", "0"))
         self.ui.rBtnFDDRep1.clicked.connect(lambda: self.plot("FDD", "1", "0"))
         self.ui.rBtnFDARep1.clicked.connect(lambda: self.plot("FDA", "1", "0")) 
@@ -80,7 +85,7 @@ class Principal(QDialog):
 
         #Botones Replay Grafica 2
 
-        self.ui.rBtnMapRep2.clicked.connect(lambda: self.viewMap("0"))
+        self.ui.rBtnMapRep2.clicked.connect(self.viewMap)
         self.ui.rBtnPDDRRep2.clicked.connect(lambda: self.plot("PDDR", "2", "0"))
         self.ui.rBtnFDDRep2.clicked.connect(lambda: self.plot("FDD", "2", "0"))
         self.ui.rBtnFDARep2.clicked.connect(lambda: self.plot("FDA", "2", "0")) 
@@ -88,20 +93,43 @@ class Principal(QDialog):
         self.ui.rBtnFDCTRep2.clicked.connect(lambda: self.plot("FDCT", "2", "0"))
 
         self.ui.horizontalSlider.valueChanged.connect(self.valuechange)
-
+        
         self.show()
+        self.i=0
+        self.aux=0
 
+    def playGraph(self):
+        if self.i >= int(self.info['size']):
+            self.i=self.aux = 0
+        self.thread = threading.Timer(1.0,self.worker)
+        self.thread.start()
+
+
+    def worker(self):
+        if self.i < int(self.info['size']):
+            self.i+=1
+            self.aux = self.i
+            self.ui.horizontalSlider.setValue(self.i)
+
+            self.thread = threading.Timer(1.0,self.worker)
+            self.thread.start()
+        if self.aux != self.i:
+            self.i = self.aux
+
+    def stopGraph(self):
+        self.i = int(self.info['size'])
+        
     def valuechange(self):
-        size = self.ui.horizontalSlider.value()
-        print(size, self.G1, self.G2)
-        if self.G1 != "none" and self.G1 != "MAP":
-            self.plot(self.G1, "1", str(size))
-        if self.G1 == "MAP":
-            self.viewMap(str(size))
-        if self.G2 != "none" and self.G2 != "MAP":
-            self.plot(self.G2, "2", str(size))
-        if self.G2 == "MAP":
-             self.viewMap(str(size))
+        self.size = self.ui.horizontalSlider.value() 
+
+        if self.G1 != "none" and self.G1 != "MAP1":
+            self.plot(self.G1, "1", str(self.size))
+        if self.G1 == "MAP1":
+            self.add_marker(str(self.size),self.G1)
+        if self.G2 != "none" and self.G2 != "MAP2":
+            self.plot(self.G2, "2", str(self.size))
+        if self.G2 == "MAP2":
+             self.add_marker(str(self.size),self.G2)
 
     def alertar(self,texto):
         mensaje = QMessageBox(self)
@@ -125,7 +153,7 @@ class Principal(QDialog):
             #print(self.coordinates)
             self.alertar("Archivo cargado")
 
-    def plot(self, graph, Wview, index):
+    """def plot(self, graph, Wview, index):
         Fs = 5e6
         if Wview == "1":
             self.G1 = graph
@@ -327,11 +355,14 @@ class Principal(QDialog):
                 </body>
             </html>''')
             if Wview == "1":
-                self.ui.WRepG1.setZoomFactor(1)
-                self.ui.WRepG1.setHtml(html)
+                self.webView1.setZoomFactor(1)
+                self.webView1.setHtml(html)
+                self.ui.vLRepG1.addWidget(self.webView1)
+               
             if Wview == "2":
-                self.ui.WRepG2.setZoomFactor(1)
-                self.ui.WRepG2.setHtml(html)
+                self.webView2.setZoomFactor(1)
+                self.webView2.setHtml(html)
+                self.ui.vLRepG2.addWidget(self.webView2)
         else:
             fig.write_html(buffer, include_plotlyjs='directory', full_html=False)
 
@@ -367,12 +398,204 @@ class Principal(QDialog):
             f.close()
             url = QUrl(os.path.abspath(__file__).replace(os.sep, '/'))
             if Wview == "1":
-                self.ui.WRepG1.setZoomFactor(0.5)
-                self.ui.WRepG1.setHtml(html, baseUrl=url)
+                self.webView1.setZoomFactor(0.5)
+                self.webView1.setHtml(html, baseUrl=url)
+                self.ui.vLRepG1.addWidget(self.webView1)
             if Wview == "2":
-                self.ui.WRepG2.setZoomFactor(0.5)
-                self.ui.WRepG2.setHtml(html, baseUrl=url)
+                self.webView2.setZoomFactor(0.5)
+                self.webView2.setHtml(html, baseUrl=url)
+                self.ui.vLRepG2.addWidget(self.webView2)"""
+    def plot(self, graph, Wview, index):
+        Fs = 5e6
+        if Wview == "1":
+            self.G1 = graph
+        if Wview == "2":
+            self.G2 = graph
+        graphRoute = self.graphsRoute + index
+        #self.setSlider(int(self.info['size']))
+        # Switch
+        print(graph)
+        if graph == "FDA":
+            graphRoute += "/correlacionDeFrecuencia.csv"
+        if graph == "PDDR":
+            graphRoute += "/perfilDePotenciaDeRetardo.csv"
+        if graph == "DEDP":
+            graphRoute += "/densidadEspectralDePotencia.csv"
+        if graph == "FDD":
+            graphRoute += "/funcionDeDispersion.csv"
+
+        if graph == "FDCT":
+            graphRoute += "/correlacionTemporal.csv"
+
+        buffer = io.StringIO()
+        #print(self.df)
+        if graph == "FDA":
+            with open(graphRoute) as csv_file:
+                csv_reader = csv.reader(csv_file, delimiter=',')
+                for x in csv_reader:
+                    df = np.array(x).astype(float)
+            fig = px.scatter(x=np.linspace(-Fs/2, Fs/2 - Fs/df.size, df.size), y=np.roll(df, int(df.size/2)))
+            fig.update_layout(hovermode="x")
+            fig.update_traces(mode="markers+lines", hovertemplate=None)
+            fig.update_layout(
+                hoverlabel=dict(
+                    font_size=50,
+                    font_family="Rockwell"
+                )
+            )
+            fig.update_xaxes(
+                title="Δf",
+                titlefont=dict(
+                    size=30
+                ),
+                tickfont = dict(
+                    size= 25
+                ), 
+            )
+            fig.update_yaxes(
+                title="Índice",
+                titlefont=dict(
+                    size=30
+                ),
+                tickfont = dict(
+                    size= 25
+                )
+            )
+        if graph == "PDDR":
+            with open(graphRoute) as csv_file:
+                csv_reader = csv.reader(csv_file, delimiter=',')
+                for x in csv_reader:
+                    df = np.array(x).astype(float)
+            fig = px.scatter(x=np.linspace(0, 1/Fs, df.size), y=df)
+            fig.update_layout(hovermode="x")
+            fig.update_traces(mode="markers+lines", hovertemplate=None)
+            fig.update_layout(
+                hoverlabel=dict(
+                    font_size=50,
+                    font_family="Rockwell"
+                )
+            )
+            fig.update_xaxes(
+                title="Retardos",
+                titlefont=dict(
+                    size=30
+                ),
+                showexponent = 'all',
+                tickformat = '.0e',
+                rangemode = 'tozero',
+                tickfont = dict(
+                    size= 25
+                ), 
+                tickangle=30
+            )
+            fig.update_yaxes(
+                title="Potencia Normalizada",
+                titlefont=dict(
+                    size=30
+                ),
+                tickfont = dict(
+                    size= 25
+                )
+            )
+        if graph == "DEDP":
+            with open(graphRoute) as csv_file:
+                csv_reader = csv.reader(csv_file, delimiter=',')
+                for x in csv_reader:
+                    df = np.array(x).astype(float)
+            fig = px.scatter(x=np.linspace(-Fs/2, Fs/2 - 1, df.size), y=np.roll(df, int(df.size/2)) + 1, log_y=True)
+            fig.update_layout(hovermode="x")
+            fig.update_traces(mode="markers+lines", hovertemplate=None)
+            fig.update_layout(
+                hoverlabel=dict(
+                    font_size=50,
+                    font_family="Rockwell"
+                )
+            )
+            fig.update_xaxes(
+                title="Hz",
+                titlefont=dict(
+                    size=30
+                ),
+                tickfont = dict(
+                    size= 25
+                ), 
+            )
+            fig.update_yaxes(
+                title="dB/Hz",
+                titlefont=dict(
+                    size=30
+                ),
+                tickfont = dict(
+                    size= 25
+                )
+            )
+        if graph == "FDCT":
+            with open(graphRoute) as csv_file:
+                csv_reader = csv.reader(csv_file, delimiter=',')
+                for x in csv_reader:
+                    df = np.array(x).astype(float)
+            fig = px.scatter(x=np.linspace(0, Fs-1, df.size), y=np.fft.fftshift(df))
+            fig.update_layout(hovermode="x")
+            fig.update_traces(mode="markers+lines", hovertemplate=None)
+            fig.update_layout(
+                hoverlabel=dict(
+                    font_size=50,
+                    font_family="Rockwell"
+                )
+            )
+            fig.update_xaxes(
+                title="",
+                titlefont=dict(
+                    size=30
+                ),
+                tickfont = dict(
+                    size= 25
+                ), 
+            )
+            fig.update_yaxes(
+                title="Correlación normalizada",
+                titlefont=dict(
+                    size=30
+                ),
+                tickfont = dict(
+                    size= 25
+                )
+            )
+        if graph == "FDD":
+            z_data = pd.read_csv(graphRoute)
+            fig = go.Figure(
+                data=[
+                    go.Surface(z=np.fft.fftshift(z_data.values, axes=0), x = np.linspace(0, int(z_data.shape[1]), int(z_data.shape[1])+1), y = np.linspace(-(int(z_data.shape[0])+1)/2, (int(z_data.shape[0])+1)/2, int(z_data.shape[0])+1))
+                    ]
+                )
+            fig.update_layout(
+                    title='', autosize=True,
+                    width=850, height=550,
+                    margin=dict(l=65, r=50, b=65, t=90),
+                    xaxis=dict(
+                        title="x_value",
+                        titlefont=dict(
+                            size=40
+                        )
+                    ),
+                    yaxis=dict(
+                        title="y_value",
+                        titlefont=dict(
+                            size=40
+                        )
+                    )
+                )
+        url = QUrl(os.path.abspath(__file__).replace(os.sep, '/'))
+        if Wview == "1":
+            self.webView1.setZoomFactor(0.5)
+            self.webView1.setHtml(fig.to_html(include_plotlyjs='cdn'),baseUrl=url)
+            self.ui.vLRepG1.addWidget(self.webView1)
         
+        if Wview == "2":
+            self.webView2.setZoomFactor(0.5)
+            self.webView2.setHtml(fig.to_html(include_plotlyjs='cdn'),baseUrl=url)
+            self.ui.vLRepG2.addWidget(self.webView2)
+
     def saveFile(self):
         options = QFileDialog.Options()
         options |= QFileDialog.DontUseNativeDialog
@@ -380,39 +603,34 @@ class Principal(QDialog):
         if fileName:
             print(fileName)
     
-    def viewMap(self, point):
-        self.fpoint = self.coordinates[int(point)]
+    def viewMap(self):
+        self.size = self.ui.horizontalSlider.value()
         self.m = folium.Map(
         	tiles=#'Stamen Toner',
             'Stamen Terrain',
         	zoom_start=15,
-        	location= self.fpoint
-        )
-        print(int(point))
-        #html = "<p>Latitud: 20.628269</p><p>Longitud: -103.284029</p>"
-        #iframe1 = branca.element.IFrame(html=html, width=300, height=100)
-        #for point in self.coordinates:
-        self.marcado = folium.Marker(location=self.coordinates[int(point)],
-        popup=self.coordinates[int(point)],tooltip=Tooltip,
-        icon=folium.Icon(color="red")).add_to(self.m)
-        folium.PolyLine(self.coordinates, color="yellow", weight=3, opacity=1).add_to(self.m)
+        	location= self.coordinates[int(self.size)]
+            )
+        marker = folium.Marker(location=self.coordinates[int(self.size)]).add_to(self.m)
+        folium.PolyLine(self.coordinates, color="red", weight=3, opacity=1).add_to(self.m)
         # save map data to data object
-        
         self.data = io.BytesIO()
         self.m.save(self.data, close_file=False)
         #switch(self.ui.)
-        
         if self.ui.rBtnMapRec1.isChecked():
             self.ui.WRecG1.setHtml(self.data.getvalue().decode())
+
         if self.ui.rBtnMapRec2.isChecked():
             self.ui.WRecG2.setHtml(self.data.getvalue().decode())
+
         if self.ui.rBtnMapRep1.isChecked():
-            self.ui.WRepG1.setHtml(self.data.getvalue().decode())
-            self.G1 = "MAP"
+            self.webView1.setHtml(self.data.getvalue().decode())
+            self.ui.vLRepG1.addWidget(self.webView1)
+            self.G1 = "MAP1"
         if self.ui.rBtnMapRep2.isChecked():
-            self.ui.WRepG2.setHtml(self.data.getvalue().decode())
-            self.G2 = "MAP"
-        #self.addWidget(webView)
+            self.webView2.setHtml(self.data.getvalue().decode())
+            self.ui.vLRepG2.addWidget(self.webView2)
+            self.G2 = "MAP2"            
 
     def StartSesion(self):
         if not self.status:
@@ -438,6 +656,36 @@ class Principal(QDialog):
         self.ui.horizontalSlider.setMaximum(top)
         self.ui.horizontalSlider.setTickInterval(top)
         self.ui.horizontalSlider.setTickPosition(QSlider.TicksBothSides)
+
+    def add_marker(self,point,Wview):
+        self.fpoint = self.coordinates[int(point)]
+        print(self.m.get_name())
+        print(self.fpoint)
+        if Wview == "MAP1":
+            js = Template(
+             """ 
+             {{map}}.eachLayer(function (layer){
+                 if(layer._icon)
+                 {{map}}.removeLayer(layer);;});
+                  marker = new L.marker([{{latitude}}, {{longitude}}] );
+                {{map}}.addLayer(marker);
+                {{map}}.setView([{{latitude}}, {{longitude}}],15);
+        """
+            ).render(map=self.m.get_name(), latitude=self.fpoint[0], longitude=self.fpoint[1])
+            self.webView1.page().runJavaScript(js)
+
+        if Wview == "MAP2":
+            js = Template(
+             """ 
+             {{map}}.eachLayer(function (layer){
+                 if(layer._icon)
+                 {{map}}.removeLayer(layer);;});
+                  marker = new L.marker([{{latitude}}, {{longitude}}] );
+        {{map}}.addLayer(marker);
+        {{map}}.setView([{{latitude}}, {{longitude}}],15);
+        """
+            ).render(map=self.m.get_name(), latitude=self.fpoint[0], longitude=self.fpoint[1])
+            self.webView2.page().runJavaScript(js)
 
 def main():
     app = QApplication(sys.argv)

@@ -949,35 +949,31 @@ font: 14pt &quot;MS Shell Dlg 2&quot;;
       <string/>
      </property>
     </widget>
-    <widget class="QWebView" name="WRepG1" native="true">
+    <widget class="QWidget" name="verticalLayoutWidget">
      <property name="geometry">
       <rect>
        <x>100</x>
        <y>30</y>
-       <width>421</width>
+       <width>431</width>
        <height>251</height>
       </rect>
      </property>
-     <property name="url" stdset="0">
-      <url>
-       <string>about:blank</string>
-      </url>
-     </property>
+     <layout class="QVBoxLayout" name="vLRepG1">
+      <property name="sizeConstraint">
+       <enum>QLayout::SetDefaultConstraint</enum>
+      </property>
+     </layout>
     </widget>
-    <widget class="QWebView" name="WRepG2" native="true">
+    <widget class="QWidget" name="verticalLayoutWidget_2">
      <property name="geometry">
       <rect>
-       <x>540</x>
+       <x>550</x>
        <y>30</y>
-       <width>421</width>
+       <width>431</width>
        <height>251</height>
       </rect>
      </property>
-     <property name="url" stdset="0">
-      <url>
-       <string>about:blank</string>
-      </url>
-     </property>
+     <layout class="QVBoxLayout" name="vLRepG2"/>
     </widget>
    </widget>
   </widget>
