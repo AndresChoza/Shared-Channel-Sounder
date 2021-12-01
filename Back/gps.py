@@ -32,7 +32,11 @@ class Gps(threading.Thread):
                     splited_decoded = decoded_bytes.split(',')
                     if splited_decoded[0] == '$GNRMC':
                         type = splited_decoded[0]
-                        time = splited_decoded[1]
+
+                        self.data_lock.acquire()
+                        self.time = splited_decoded[1]
+                        self.data_lock.release()
+
                         self.state = True if splited_decoded[2]=="A" else False
                         latitude = splited_decoded[3]
                         longitude = splited_decoded[5]
@@ -75,6 +79,8 @@ class Gps(threading.Thread):
 
     def getPosition(self):
         return (self.ActualLatitude, self.ActualLongitude)
+    def getTime(self):
+        return (self.time)
 
 class ServiceExit(Exception):
     """

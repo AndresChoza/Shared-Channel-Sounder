@@ -10,8 +10,9 @@ from tqdm import tqdm
 
 
 class head:
-    def __init__(self, pos):
-        self.time = datetime.today().strftime('%Y-%m-%d %H:%M:%f')
+    def __init__(self, pos, time):
+        #self.time = datetime.today().strftime('%Y-%m-%d %H:%M:%f')
+        self.time = time
         self.possition = pos
 class sesion_header:
     def __init__(self, name, size, dir, pos):
@@ -31,7 +32,7 @@ class controller:
         self.positions = []
         print(self.date)
 
-    def makeOp(self, h, coord):
+    def makeOp(self, h, coord, time):
         # Perfil de potencia de retardo
         startC = time.time()
         start = time.time()
@@ -67,7 +68,7 @@ class controller:
             os.makedirs(dir)
 
         text_file = open(dir + "/header.json", "w")
-        text_file.write(json.dumps(head(coord).__dict__))
+        text_file.write(json.dumps(head(coord, time).__dict__))
         text_file.close()
         self.positions.append(coord)
 

@@ -67,7 +67,7 @@ class Server(threading.Thread):
                     header = fullmessage[:32].decode("utf-8").split(';')
                     message = np.frombuffer(fullmessage[32:], dtype=eval(header[0])).reshape(eval(header[1]))
                     print('time to get the data: ', time.time() - start)
-                    operationController.makeOp(message, self.gpsObject.getPosition())
+                    operationController.makeOp(message, self.gpsObject.getPosition(), self.gpsObject.getTime())
                     # Clean up the connection
                     connection.close()
         self.gpsObject.shutdown_flag.set()
