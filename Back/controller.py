@@ -32,7 +32,7 @@ class controller:
         self.positions = []
         print(self.date)
 
-    def makeOp(self, h, coord, time):
+    def makeOp(self, h, coord, Gpstime):
         # Perfil de potencia de retardo
         startC = time.time()
         start = time.time()
@@ -68,7 +68,7 @@ class controller:
             os.makedirs(dir)
 
         text_file = open(dir + "/header.json", "w")
-        text_file.write(json.dumps(head(coord, time).__dict__))
+        text_file.write(json.dumps(head(coord, Gpstime).__dict__))
         text_file.close()
         self.positions.append(coord)
 
