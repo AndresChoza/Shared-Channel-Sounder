@@ -5,6 +5,7 @@ import threading
 import signal
 import time
 
+COM_PORT = "COM5"
 
 class Gps(threading.Thread):
     def __init__(self):
@@ -14,16 +15,17 @@ class Gps(threading.Thread):
         self.data_lock.acquire()
         self.ActualLatitude = 0
         self.ActualLongitude = 0
+        self.ctime = 0
         self.data_lock.release()
     
     def run(self):
         try:
-            ser = serial.Serial('COM5', 9600, timeout=2)
+            ser = serial.Serial(COM_PORT, 9600, timeout=2)
             ser.flushInput()
             print("gps listening")
         except Exception as e:
-            print("cant not connect to the gps via COM3")
-            print(e)
+            print("cant not connect to the gps via "+ COM_PORT +", the gps is Off\n")
+            #print(e)
         else:
             while not self.shutdown_flag.is_set():
                 try:
@@ -34,7 +36,7 @@ class Gps(threading.Thread):
                         type = splited_decoded[0]
 
                         self.data_lock.acquire()
-                        self.time = splited_decoded[1]
+                        self.ctime = splited_decoded[1]
                         self.data_lock.release()
 
                         self.state = True if splited_decoded[2]=="A" else False
@@ -80,7 +82,7 @@ class Gps(threading.Thread):
     def getPosition(self):
         return (self.ActualLatitude, self.ActualLongitude)
     def getTime(self):
-        return (self.time)
+        return (self.ctime)
 
 class ServiceExit(Exception):
     """

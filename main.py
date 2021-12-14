@@ -25,6 +25,7 @@ import plotly.graph_objects as go
 from jinja2 import Template
 import time 
 import threading
+import signal
 
 from Back import server
 class Principal(QDialog):
@@ -53,7 +54,7 @@ class Principal(QDialog):
         #Botones Generales Replay
         self.ui.btnPlay.clicked.connect(self.playGraph)
         self.ui.btnPause.clicked.connect(self.stopGraph)
-        self.ui.btnOpenFile.clicked.connect(self.getCSV)
+        self.ui.btnOpenFile.clicked.connect(self.getJSON)
 
         #Botones REC Grafica 1
 
@@ -76,20 +77,20 @@ class Principal(QDialog):
         #Botones Replay Grafica 1
 
         self.ui.rBtnMapRep1.clicked.connect(self.viewMap) 
-        self.ui.rBtnPDDRRep1.clicked.connect(lambda: self.plot("PDDR", "1", "0"))
-        self.ui.rBtnFDDRep1.clicked.connect(lambda: self.plot("FDD", "1", "0"))
-        self.ui.rBtnFDARep1.clicked.connect(lambda: self.plot("FDA", "1", "0")) 
-        self.ui.rBtnDEDPRep1.clicked.connect(lambda: self.plot("DEDP", "1", "0"))
-        self.ui.rBtnFDCTRep1.clicked.connect(lambda: self.plot("FDCT", "1", "0"))
+        self.ui.rBtnPDDRRep1.clicked.connect(lambda: self.changePlot("PDDR", "1"))
+        self.ui.rBtnFDDRep1.clicked.connect(lambda: self.changePlot("FDD", "1"))
+        self.ui.rBtnFDARep1.clicked.connect(lambda: self.changePlot("FDA", "1")) 
+        self.ui.rBtnDEDPRep1.clicked.connect(lambda: self.changePlot("DEDP", "1"))
+        self.ui.rBtnFDCTRep1.clicked.connect(lambda: self.changePlot("FDCT", "1"))
 
         #Botones Replay Grafica 2
 
         self.ui.rBtnMapRep2.clicked.connect(self.viewMap)
-        self.ui.rBtnPDDRRep2.clicked.connect(lambda: self.plot("PDDR", "2", "0"))
-        self.ui.rBtnFDDRep2.clicked.connect(lambda: self.plot("FDD", "2", "0"))
-        self.ui.rBtnFDARep2.clicked.connect(lambda: self.plot("FDA", "2", "0")) 
-        self.ui.rBtnDEDPRep2.clicked.connect(lambda: self.plot("DEDP", "2", "0"))
-        self.ui.rBtnFDCTRep2.clicked.connect(lambda: self.plot("FDCT", "2", "0"))
+        self.ui.rBtnPDDRRep2.clicked.connect(lambda: self.changePlot("PDDR", "2"))
+        self.ui.rBtnFDDRep2.clicked.connect(lambda: self.changePlot("FDD", "2"))
+        self.ui.rBtnFDARep2.clicked.connect(lambda: self.changePlot("FDA", "2")) 
+        self.ui.rBtnDEDPRep2.clicked.connect(lambda: self.changePlot("DEDP", "2"))
+        self.ui.rBtnFDCTRep2.clicked.connect(lambda: self.changePlot("FDCT", "2"))
 
         self.ui.horizontalSlider.valueChanged.connect(self.valuechange)
         
@@ -137,7 +138,7 @@ class Principal(QDialog):
         mensaje.setText(texto)
         mensaje.exec_()
 
-    def getCSV(self):
+    def getJSON(self):
         # this will get only the header file, with the header file will know all the information necesary to show the record of a sesion
         filePath, _ = QFileDialog.getOpenFileName(self, 'Open file', '', filter="*.json")
         if filePath != "":
@@ -404,6 +405,9 @@ class Principal(QDialog):
                 self.webView2.setZoomFactor(0.5)
                 self.webView2.setHtml(html, baseUrl=url)
                 self.ui.vLRepG2.addWidget(self.webView2)"""
+    def changePlot(self, graph, Wview):
+        self.plot(graph, Wview, str(self.ui.horizontalSlider.value()))
+        pass
     def plot(self, graph, Wview, index):
         Fs = 5e6
         if Wview == "1":
@@ -634,16 +638,20 @@ class Principal(QDialog):
     def StartSesion(self):
         if not self.status:
             self.name, self.estado = QInputDialog.getText(self,"Sesion", "Nombre de la Sesion:")
-            if self.name and self.estado != '' : 
+            if self.estado: 
                 print('Nombre:', self.name)
-            self.status = True
-            self.serv = Server(self.name)
-            self.serv.start()
-            self.ui.btnRec.setStyleSheet("border-image: url(:/botones/BotonStop.jpg);")
+                self.status = True
+                self.serv = Server(self.name)
+                self.serv.start()
+                self.updater = Updater(self.serv)
+                self.updater.start()
+                self.ui.btnRec.setStyleSheet("border-image: url(:/botones/BotonStop.jpg);")
         else:
             self.status = False
             self.serv.shutdown_flag.set()
             self.serv.join()
+            self.updater.shutdown_flag.set()
+            self.updater.join()
             self.ui.btnRec.setStyleSheet("border-image: url(:/botones/BotonRec.jpg);")
             self.alertar("Sesion Finalizada")
 
@@ -686,7 +694,24 @@ class Principal(QDialog):
             ).render(map=self.m.get_name(), latitude=self.fpoint[0], longitude=self.fpoint[1])
             self.webView2.page().runJavaScript(js)
 
+class Updater(threading.Thread):
+    def __init__(self, serve):
+        threading.Thread.__init__(self, daemon=True)
+        self.shutdown_flag = threading.Event()
+        self.serve = serve
+    def run(self):
+        while not self.shutdown_flag.is_set():
+            time.sleep(1)
+            if self.serve.newOp_flag.is_set():
+                print("Hi new data is avaliabe")
+                self.serve.newOp_flag.clear()
+        print("stop of the updater")
+            
+
+    
+
 def main():
+    
     app = QApplication(sys.argv)
     ventana = Principal()
 

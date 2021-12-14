@@ -13,6 +13,7 @@ class Server(threading.Thread):
         # The shutdown_flag is a threading.Event object that
         # indicates whether the thread should be terminated.
         self.shutdown_flag = threading.Event()
+        self.newOp_flag = threading.Event()
         self.name = name
     
     def run(self):
@@ -70,6 +71,9 @@ class Server(threading.Thread):
                     operationController.makeOp(message, self.gpsObject.getPosition(), self.gpsObject.getTime())
                     # Clean up the connection
                     connection.close()
+                    
+                    self.newOp_flag.set()
+                    
         self.gpsObject.shutdown_flag.set()
         self.gpsObject.join()
         if start_flag:
