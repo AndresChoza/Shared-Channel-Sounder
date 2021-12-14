@@ -92,22 +92,31 @@ class Principal(QDialog):
         self.ui.rBtnDEDPRep2.clicked.connect(lambda: self.changePlot("DEDP", "2"))
         self.ui.rBtnFDCTRep2.clicked.connect(lambda: self.changePlot("FDCT", "2"))
 
+        #Botones Slider
+        self.ui.btnSpeed1.clicked.connect(lambda: self.setSpeed(1))
+        self.ui.btnSpeed5.clicked.connect(lambda: self.setSpeed(5))
+        self.ui.btnSpeed10.clicked.connect(lambda: self.setSpeed(10))
+
         self.ui.horizontalSlider.valueChanged.connect(self.valuechange)
         
         self.show()
         self.i=0
         self.aux=0
+        self.speed =1
 
     def playGraph(self):
         if self.i >= int(self.info['size']):
             self.i=self.aux = 0
+            self.speed =1
         self.thread = threading.Timer(1.0,self.worker)
         self.thread.start()
 
+    def setSpeed(self,velocidad): 
+        self.speed = velocidad
 
     def worker(self):
         if self.i < int(self.info['size']):
-            self.i+=1
+            self.i+=self.speed
             self.aux = self.i
             self.ui.horizontalSlider.setValue(self.i)
 
