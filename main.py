@@ -600,12 +600,12 @@ class Principal(QDialog):
         url = QUrl(os.path.abspath(__file__).replace(os.sep, '/'))
         if Wview == "1":
             self.webView1.setZoomFactor(0.5)
-            self.webView1.setHtml(fig.to_html(include_plotlyjs='cdn'),baseUrl=url)
+            self.webView1.setHtml(fig.to_html(include_plotlyjs='directory'),baseUrl=url)
             self.ui.vLRepG1.addWidget(self.webView1)
         
         if Wview == "2":
             self.webView2.setZoomFactor(0.5)
-            self.webView2.setHtml(fig.to_html(include_plotlyjs='cdn'),baseUrl=url)
+            self.webView2.setHtml(fig.to_html(include_plotlyjs='directory'),baseUrl=url)
             self.ui.vLRepG2.addWidget(self.webView2)
 
     def saveFile(self):
