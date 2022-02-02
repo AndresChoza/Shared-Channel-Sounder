@@ -13,9 +13,9 @@ class Gps(threading.Thread):
         self.shutdown_flag = threading.Event()
         self.data_lock = threading.Lock()
         self.data_lock.acquire()
-        self.ActualLatitude = 0
-        self.ActualLongitude = 0
-        self.ctime = 0
+        self.ActualLatitude = "0"
+        self.ActualLongitude = "0"
+        self.ctime = "0"
         self.data_lock.release()
     
     def run(self):
@@ -80,9 +80,14 @@ class Gps(threading.Thread):
             print("gps off")
 
     def getPosition(self):
-        return (self.ActualLatitude, self.ActualLongitude)
+        if not self.shutdown_flag.is_set():
+            return (self.ActualLatitude, self.ActualLongitude)
+        return ("0", "0")
     def getTime(self):
-        return (self.ctime)
+        if not self.shutdown_flag.is_set():
+            return (self.ctime)
+        else:
+            return time.strftime("%H:%M:%S", time.localtime())
 
 class ServiceExit(Exception):
     """

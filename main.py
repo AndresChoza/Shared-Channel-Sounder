@@ -598,15 +598,20 @@ class Principal(QDialog):
                     )
                 )
         url = QUrl(os.path.abspath(__file__).replace(os.sep, '/'))
+        html = fig.to_html(include_plotlyjs='directory')
         if Wview == "1":
             self.webView1.setZoomFactor(0.5)
-            self.webView1.setHtml(fig.to_html(include_plotlyjs='directory'),baseUrl=url)
+            self.webView1.setHtml(html, baseUrl=url)
             self.ui.vLRepG1.addWidget(self.webView1)
         
         if Wview == "2":
             self.webView2.setZoomFactor(0.5)
-            self.webView2.setHtml(fig.to_html(include_plotlyjs='directory'),baseUrl=url)
+            self.webView2.setHtml(html, baseUrl=url)
             self.ui.vLRepG2.addWidget(self.webView2)
+        
+        f = open("graph"+Wview+".html", "w")
+        f.write(html)
+        f.close()
 
     def saveFile(self):
         options = QFileDialog.Options()
