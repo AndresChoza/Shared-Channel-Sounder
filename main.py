@@ -1,6 +1,6 @@
 from logging import setLogRecordFactory 
 from types import coroutine
-from PyQt5 import QtWidgets
+#from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import QByteArray, QUrl, Qt
 from folium.map import Tooltip

@@ -17,6 +17,7 @@ class Gps(threading.Thread):
         self.ActualLongitude = "0"
         self.ctime = "0"
         self.data_lock.release()
+        self.state = False
     
     def run(self):
         try:
@@ -28,6 +29,7 @@ class Gps(threading.Thread):
             #print(e)
         else:
             while not self.shutdown_flag.is_set():
+                self.state = True
                 try:
                     ser_bytes = ser.readline()
                     decoded_bytes = ser_bytes[0:len(ser_bytes)-2].decode("utf-8")
@@ -77,14 +79,15 @@ class Gps(threading.Thread):
                     print(ValueError)
                     print("Keyboard Interrupt")
                     break
+            self.state = False
             print("gps off")
 
     def getPosition(self):
-        if not self.shutdown_flag.is_set():
+        if self.state:
             return (self.ActualLatitude, self.ActualLongitude)
         return ("0", "0")
     def getTime(self):
-        if not self.shutdown_flag.is_set():
+        if self.state:
             return (self.ctime)
         else:
             return time.strftime("%H:%M:%S", time.localtime())
