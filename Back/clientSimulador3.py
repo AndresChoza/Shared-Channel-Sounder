@@ -1,3 +1,5 @@
+from cProfile import run
+from mimetypes import init
 import threading
 import numpy as np
 import socket
@@ -23,48 +25,55 @@ class NewClient(threading.Thread):
 
 
         ######################
-        self.Fs = Fs
+        #self.Fs = Fs
+        self.Fs_G = Fs
+        self.Fmax_G = Fmax
+        self.N_G = N
 
-        #Cost 207 Model (Tux)
-        self.delay = np.array([0,0.217,0.512,0.514,0.517,0.674,0.882,1.230,1.287,1.311,1.349,1.533,1.535,1.1622,1.818,1.836,1.884,1.943,2.048,2.140])*1e-6
-        pw_db = np.array([-5.7,-7.6,-10.1,-10.2,-10.2,-11.5,-13.4,-16.3,-16.9,-17.1,-17.4,-19,-19,-19.8,-21.5,-21.6,-22.1,-22.6,-23.5,-24.3])
-        self.pw_lineal = 10**(pw_db/10)
+        # #Cost 207 Model (Tux)
+        # #Prueba con variaciones
+        # self.delay = np.array([0,0.217,0.512,0.514,0.517,0.674,0.882,1.230,1.287,1.311,1.349,1.533,1.535,1.1622,1.818,1.836,1.884,1.943,2.048,2.140])*1e-6 
+        # np.random.shuffle(self.delay)
+        # pw_db = np.array([-5.7,-7.6,-10.1,-10.2,-10.2,-11.5,-13.4,-16.3,-16.9,-17.1,-17.4,-19,-19,-19.8,-21.5,-21.6,-22.1,-22.6,-23.5,-24.3])
+        # np.random.shuffle(pw_db)
+        # self.pw_lineal = 10**(pw_db/10)
 
-        TauMax = self.delay[-1] #Retardo Máximo
+        # TauMax = self.delay[-1] #Retardo Maximo
+        # #TauMax = np.max(self.delay)
 
-        self.M=np.size(self.delay)
-        #N=2000
-        self.N = N
-        self.L=TauMax*Fs
-        self.L = int(np.floor(self.L))
+        # self.M=np.size(self.delay)
+        # #N=2000
+        # self.N = N
+        # self.L=TauMax*Fs
+        # self.L = int(np.floor(self.L))
 
         
         
         
 
-        ##############################JAKES###########################
-        #Introducimos el filtro FIR de distribución Jakes a cada uno de los coeficientes de x_q y x_i 
-        Fs_J = 5e5
-        N1=20001
-        N_Hamming=2001
-        f_lin = (np.linspace(-Fs_J/2,Fs_J/2,N1)) #O bien define tu linspace como complejo (?)
-        #Fmax = FMax
-        Sc_LambdaT = (1/((np.pi)*Fmax*(np.sqrt(1-((np.complex64(f_lin)/Fmax)**2))+0.0000001)))  #np.sqrt no puede lidiar con complejos, solo cmath.sqrt
-        #Necesitamos la parte real y luego todo fuera de Fmax debe ser 0 
-        Sc_LambdaT = np.real(Sc_LambdaT)
-        Sc_LambdaT[abs(f_lin)>=Fmax] = 0
-        Hf = np.sqrt(Sc_LambdaT)
-        Hf_FL = np.fft.fftshift(np.fft.ifft(np.fft.ifftshift(Hf)))
-        window = np.hamming(N_Hamming)
-        window = np.pad(window, (9000,9000), 'constant', constant_values=(0,0))
+        # ##############################JAKES###########################
+        # #Introducimos el filtro FIR de distribución Jakes a cada uno de los coeficientes de x_q y x_i 
+        # Fs_J = 5e5
+        # N1=20001
+        # N_Hamming=2001
+        # f_lin = (np.linspace(-Fs_J/2,Fs_J/2,N1)) #O bien define tu linspace como complejo (?)
+        # #Fmax = FMax
+        # Sc_LambdaT = (1/((np.pi)*Fmax*(np.sqrt(1-((np.complex64(f_lin)/Fmax)**2))+0.0000001)))  #np.sqrt no puede lidiar con complejos, solo cmath.sqrt
+        # #Necesitamos la parte real y luego todo fuera de Fmax debe ser 0 
+        # Sc_LambdaT = np.real(Sc_LambdaT)
+        # Sc_LambdaT[abs(f_lin)>=Fmax] = 0
+        # Hf = np.sqrt(Sc_LambdaT)
+        # Hf_FL = np.fft.fftshift(np.fft.ifft(np.fft.ifftshift(Hf)))
+        # window = np.hamming(N_Hamming)
+        # window = np.pad(window, (9000,9000), 'constant', constant_values=(0,0))
 
-        self.hfw = Hf_FL*window
+        # self.hfw = Hf_FL*window
 
-        self.hfw = self.hfw[self.hfw != 0]
+        # self.hfw = self.hfw[self.hfw != 0]
 
-        self.hfw = self.hfw / np.linalg.norm(self.hfw) #Normalizamos
+        # self.hfw = self.hfw / np.linalg.norm(self.hfw) #Normalizamos
 
-        ##############Jakes############
+        # ##############Jakes############
     
     
     def run(self):
@@ -74,6 +83,9 @@ class NewClient(threading.Thread):
           for n in tqdm(range(100)):
               h.append(self.newH())
           #Espera en tiempo real 
+
+          #print(h)
+
           snooze = 1
           print(f"waiting...{snooze} seconds")
           snooze /= 100
@@ -104,6 +116,54 @@ class NewClient(threading.Thread):
 
 
     def newH(self):
+        ## Prueba: Recalcular ##
+        self.Fs = self.Fs_G
+        Fmax = self.Fmax_G
+
+        #Cost 207 Model (Tux)
+        #Prueba con variaciones
+        self.delay = np.array([0,0.217,0.512,0.514,0.517,0.674,0.882,1.230,1.287,1.311,1.349,1.533,1.535,1.1622,1.818,1.836,1.884,1.943,2.048,2.140])*1e-6 
+        np.random.shuffle(self.delay)
+        pw_db = np.array([-5.7,-7.6,-10.1,-10.2,-10.2,-11.5,-13.4,-16.3,-16.9,-17.1,-17.4,-19,-19,-19.8,-21.5,-21.6,-22.1,-22.6,-23.5,-24.3])
+        np.random.shuffle(pw_db)
+        self.pw_lineal = 10**(pw_db/10)
+
+        #TauMax = self.delay[-1] #Retardo Maximo
+        TauMax = np.max(self.delay)
+
+        self.M=np.size(self.delay)
+        #N=2000
+
+        self.N = self.N_G
+
+        self.L=TauMax*self.Fs
+        self.L = int(np.floor(self.L))
+
+        ##############################JAKES###########################
+        #Introducimos el filtro FIR de distribución Jakes a cada uno de los coeficientes de x_q y x_i 
+        Fs_J = 5e5
+        N1=20001
+        N_Hamming=2001
+        f_lin = (np.linspace(-Fs_J/2,Fs_J/2,N1)) #O bien define tu linspace como complejo (?)
+        #Fmax = FMax
+        Sc_LambdaT = (1/((np.pi)*Fmax*(np.sqrt(1-((np.complex64(f_lin)/Fmax)**2))+0.0000001)))  #np.sqrt no puede lidiar con complejos, solo cmath.sqrt
+        #Necesitamos la parte real y luego todo fuera de Fmax debe ser 0 
+        Sc_LambdaT = np.real(Sc_LambdaT)
+        Sc_LambdaT[abs(f_lin)>=Fmax] = 0
+        Hf = np.sqrt(Sc_LambdaT)
+        Hf_FL = np.fft.fftshift(np.fft.ifft(np.fft.ifftshift(Hf)))
+        window = np.hamming(N_Hamming)
+        window = np.pad(window, (9000,9000), 'constant', constant_values=(0,0))
+
+        self.hfw = Hf_FL*window
+
+        self.hfw = self.hfw[self.hfw != 0]
+
+        self.hfw = self.hfw / np.linalg.norm(self.hfw) #Normalizamos
+
+        ##############Jakes############
+        ##Termina Prueba: Recalcular ##
+
         #Generar Matriz RNG de Paths
         #Distribución Normal con Media 0 y Varianza (Potencia) Unitaria
         mu = 0 #Media 

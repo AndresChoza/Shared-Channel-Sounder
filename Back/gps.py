@@ -5,7 +5,7 @@ import threading
 import signal
 import time
 
-COM_PORT = "COM3" #Use COM5 in the LatePanda when the gps is via the arudino serial port
+COM_PORT = "COM5" #Use COM5 in the LatePanda when the gps is via the arudino serial port
 
 class Gps(threading.Thread):
     def __init__(self):

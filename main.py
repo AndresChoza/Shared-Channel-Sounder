@@ -27,6 +27,10 @@ import time
 import threading
 import signal
 
+#Prueba: Automatizar
+from Back.clientSimulador3 import NewClient 
+#
+
 from Back import server
 class Principal(QDialog):
 
@@ -654,6 +658,10 @@ class Principal(QDialog):
             self.name, self.estado = QInputDialog.getText(self,"Sesion", "Nombre de la Sesion:")
             if self.estado: 
                 print('Nombre:', self.name)
+                #Prueba: Automatizar
+                x = NewClient(Fmax = 20000, Fs = 5e6, N = 1024)
+                x.start()
+                #
                 self.status = True
                 self.serv = Server(self.name)
                 self.serv.start()
@@ -717,7 +725,7 @@ class Updater(threading.Thread):
         while not self.shutdown_flag.is_set():
             time.sleep(1)
             if self.serve.newOp_flag.is_set():
-                print("Hi new data is avaliabe")
+                print("Hi new data is available")
                 self.serve.newOp_flag.clear()
         print("stop of the updater")
             

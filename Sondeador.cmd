@@ -1,0 +1,1 @@
+wscript.exe "C:\Users\LattePanda\Desktop\CS\Shared-Channel-Sounder\invisible.vbs" "C:\Users\LattePanda\Desktop\CS\Shared-Channel-Sounder\Play.cmd"
