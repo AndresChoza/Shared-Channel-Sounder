@@ -12,4 +12,5 @@ Use python 3.9.6
   <span>pip install PyQtWebEngine</span></br>
   <span>pip install pandas</span></br>
   <span>pip install plotly</span></br>
+  <span>pip install scipy</span></br>
 </ul>
