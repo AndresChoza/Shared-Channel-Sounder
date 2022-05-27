@@ -121,17 +121,43 @@ class NewClient(threading.Thread):
         Fmax = self.Fmax_G
 
         #Cost 207 Model (Tux)
-        #Prueba con variaciones
-        self.delay = np.array([0,0.217,0.512,0.514,0.517,0.674,0.882,1.230,1.287,1.311,1.349,1.533,1.535,1.1622,1.818,1.836,1.884,1.943,2.048,2.140])*1e-6 
-        np.random.shuffle(self.delay)
-        pw_db = np.array([-5.7,-7.6,-10.1,-10.2,-10.2,-11.5,-13.4,-16.3,-16.9,-17.1,-17.4,-19,-19,-19.8,-21.5,-21.6,-22.1,-22.6,-23.5,-24.3])
-        np.random.shuffle(pw_db)
+        #Prueba con variaciones + random seed
+        rng = np.random.default_rng(np.random.randint(1,150,1))
+
+        #self.delay = np.array([0,0.217,0.512,0.514,0.517,0.674,0.882,1.230,1.287,1.311,1.349,1.533,1.535,1.1622,1.818,1.836,1.884,1.943,2.048,2.140])*1e-6 
+        #self.delay = np.random.uniform(0,2.5,[1,20])*1e-6
+        #self.delay = np.array([0.3,0.5,0.63,0.72,0.856,0.957,1.05,1.12,1.20,1.23,1.29,1.44,1.50,1.57,1.68,1.77,1.81,1.92,2.14,2.33])*1e-6 #Si da distinto comportamiento
+
+        delay = np.zeros(20)
+        delay[0] = 0 + np.random.randint(1,4,1)*0.1 + np.random.randint(1,10,1)*0.01
+        for i in range(1,20):
+            delay[i] = delay[i-1] + np.random.randint(0,2,1)*0.1 + np.random.randint(1,10,1)*0.01
+
+        self.delay = delay*1e-6
+
+        rng.shuffle(self.delay)
+
+        #pw_db = np.array([-5.7,-7.6,-10.1,-10.2,-10.2,-11.5,-13.4,-16.3,-16.9,-17.1,-17.4,-19,-19,-19.8,-21.5,-21.6,-22.1,-22.6,-23.5,-24.3])
+        #pw_db = np.random.uniform(-5,-25,[1,20])
+        #pw_db = np.random.randint(-25,-5,20)
+        #pw_db = np.array([-2.4,-3.5,-7.1,-8.4,-10.6,-11.2,-13.5,-15.4,-17.1,-18.5,-19.7,-20.6,-21.5,-22.1,-23.3,-25.4,-27.9,-29.2,-30.3,-31.3]) #Si da distinto comportamiento
+
+        db = np.zeros(20)
+        db[0] = np.random.randint(1,4,1)*-1 + np.random.randint(1,10,1)*-0.1
+        for i in range(1,20):
+            db[i] = db[i-1] + np.random.randint(0,2,1)*-1 + np.random.randint(1,10,1)*-0.1
+
+        pw_db = db
+
+        rng.shuffle(pw_db)
+
         self.pw_lineal = 10**(pw_db/10)
 
         #TauMax = self.delay[-1] #Retardo Maximo
-        TauMax = np.max(self.delay)
+        #TauMax = np.max(self.delay)
+        TauMax = 3.00*1e-6
 
-        self.M=np.size(self.delay)
+        self.M = np.size(self.delay)
         #N=2000
 
         self.N = self.N_G
